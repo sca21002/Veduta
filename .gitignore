@@ -1,0 +1,6 @@
+/ubr_geo_*.*
+/UBR-Geo-*
+.build
+*.log
+*.swp
+/data/*
