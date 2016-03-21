@@ -14,6 +14,56 @@ use Data::Dumper;
  
 sub BUILDARGS { $_[2] }
 
+
+sub group_within_bbox {
+    my ($self, $admin, $cond, $attrs) = @_;
+
+    print Dumper($cond);
+    return unless grep { $admin } ('gmd', 'lkr', 'regbez', 'bundlan', 'place');
+
+    my %bez = (
+        place   => \"'place'",
+        gmd     => 'gmd.bez_gem',
+        lkr     => 'lkr.bez_krs',
+        regbez  => 'regbez.bez_rbz',
+        bundlan => 'bundlan.bez_lan',
+    );
+
+    my $xmin = delete $cond->{xmin};
+    my $ymin = delete $cond->{ymin};
+    my $xmax = delete $cond->{xmax};
+    my $ymax = delete $cond->{ymax};
+    my $srt  = 4326; 
+
+
+    $attrs = {} unless ref $attrs eq 'HASH';
+
+    $attrs->{'select'} = [ 
+        $bez{$admin},
+        { count => 'me.geom' },
+        \'ST_AsGeoJSON(st_centroid(st_union(me.geom)))',
+    ];
+    $attrs->{'as'} = [
+        'admin', 'view_count', 'geom'
+    ];
+    unless ($admin eq 'place') {
+        $attrs->{join} = $admin;
+        $attrs->{group_by} = [$bez{$admin}];
+    } else {
+         $attrs->{group_by} = 'me.geom';
+    }
+
+    return $self->search(
+        \[
+            'ST_WITHIN(me.geom, ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?),3857))',
+            $xmin, $ymin, $xmax, $ymax, $srt,
+        ],
+        $attrs,
+    );
+}
+
+
+
 sub within_bbox {
     my ($self, $cond, $attrs) = @_;
 
@@ -40,8 +90,17 @@ sub within_bbox {
     );
 }
 
-sub group_by_municipalities {
-    my ($self, $cond, $attrs) = @_;
+sub group_by_admin {
+    my ($self, $admin, $cond, $attrs) = @_;
+    
+    return unless grep { $admin } ('gmd', 'lkr', 'regbez', 'bundlan', 'place');
+
+    my %bez = (
+        gmd     => 'bez_gem',
+        lkr     => 'bez_krs',
+        regbez  => 'bez_rbz',
+        bundlan => 'bez_lan',
+    );
 
     print Dumper($cond);
     my $xmin = delete $cond->{xmin};
@@ -51,33 +110,54 @@ sub group_by_municipalities {
     my $srt  = 4326; 
 
 
+
+    if ($admin eq 'place') {
+        $cond =  \[
+            "ST_WITHIN(me.geom, ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?),3857))",
+            $xmin, $ymin, $xmax, $ymax, $srt,
+        ];
+        
+    
+    } elsif ($admin eq 'bundlan') {
+        $cond =  \[
+            "ST_WITHIN(me.geom, ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?),3857))",
+            $xmin, $ymin, $xmax, $ymax, $srt,
+        ];
+        
+
+    } else {
+
+        $cond =  \[
+            "ST_WITHIN(ST_TRANSFORM(ST_CENTROID($admin.geom),3857), ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?),3857))",
+            $xmin, $ymin, $xmax, $ymax, $srt,
+        ];
+
+    }    
     $attrs = {} unless ref $attrs eq 'HASH';
 
-    $attrs->{'select'} =  
-        [
-            \'ST_AsGeoJSON(ST_TRANSFORM(ST_CENTROID(gmd.geom),3857))',
-            'gmd.bez_gem',
-            \'COUNT(gmd.geom)',
-        ];
-    $attrs->{'as'} = [
-            'center',
-            'bez_gem',
-            'view_count',
-        ];
-    $attrs->{join} = 'gmd';
-    $attrs->{group_by} = [ 'gmd.bez_gem', 'gmd.geom' ];
+    if ($admin eq 'place') {
+      
 
 
+    } else {
+
+        $attrs->{'select'} = [ 
+            "$admin." . $bez{$admin},
+            { count => "$admin.geom" },
+        ];
+        $attrs->{'as'} = [
+            $bez{$admin} ,'view_count'
+        ];
+        $attrs->{join} = $admin;
+        $attrs->{group_by} = ["$admin." . $bez{$admin}];
+    }
+ 
     return $self->search(
-        \[
-            'ST_WITHIN(me.geom, ST_Transform(ST_MakeEnvelope(?, ?, ?, ?, ?),3857))',
-            $xmin, $ymin, $xmax, $ymax, $srt,
-        ],
+        $cond,
         $attrs,
     );
+
 }
-
-
 
 sub as_geojson {
     my ($self, $cond, $attrs) = @_;

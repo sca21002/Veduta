@@ -252,6 +252,8 @@ use Geo::JSON::Feature;
 sub as_feature_object {
     my $self = shift;
 
+
+    # FIX: name geom is fixed, should be made variable
     my $geometry_object = Geo::JSON->from_json(
         $self->get_column('geom')
     );

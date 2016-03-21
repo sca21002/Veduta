@@ -1,4 +1,7 @@
 package Veduta;
+
+# ABSTRACT: Veduta is a Web Application to search geographically for vistas
+
 use Moose;
 use namespace::autoclean;
 

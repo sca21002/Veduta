@@ -82,6 +82,60 @@ sub list : Chained('views') PathPart('list') Args(0) {
     );
 }
 
+sub group_by_admin : Chained('views') PathPart('group_by_admin') Args(1) {
+    my ($self, $c, $admin) = @_;
+
+    my $bbox = $c->req->params->{bbox} || '8.98,47.27,13.83,50.56';
+
+    # TODO: check admin
+    
+    $c->log->debug('BBox: ' . $bbox);
+    my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
+
+    my $page = $c->req->params->{page} || 1; 
+    $c->log->debug("Page: $page");
+    my $entries_per_page = 5;
+
+    my $cond = {
+        xmin    => $xmin, 
+        ymin    => $ymin, 
+        xmax    => $xmax,
+        ymax    => $ymax,
+    };
+
+    my $view_rs_base = $c->stash->{view_rs};
+  
+    my $view_rs = $view_rs_base->group_within_bbox(
+        $admin,
+        $cond,
+        {
+            page => $page,
+            rows => $entries_per_page,
+            
+        },
+    );
+
+    my $response;
+    
+    my @rows;
+    while (my $row = $view_rs->next) {
+        my $href = { $row->get_columns() };
+        push @rows, $href; 
+    }    
+ 
+    $response->{views} = \@rows;
+
+    $response->{page}    = $page;
+    $response->{views_total} = $view_rs->pager->total_entries;
+   
+    $c->log->debug('Total entries: ', $response->{views_total});
+
+    $c->stash(
+        %$response,
+        current_view => 'JSON'
+    );
+}
+
 sub group_by_municipalities : Chained('views') PathPart('group_by_municipalities') Args(0) {
     my ($self, $c) = @_;
 
@@ -165,9 +219,24 @@ sub list_as_geojson : Chained('views') PathPart('list_as_geojson') Args(0) {
 sub group_by_admins_as_geojson : Chained('views') PathPart('group_by') Args(1) {
     my ($self, $c, $admin) = @_;
 
+    my $bbox = $c->req->params->{bbox} || '8.98,47.27,13.83,50.56';
+    $c->log->debug('BBox: ' . $bbox);
+    my ($xmin, $ymin, $xmax, $ymax) = split(',', $bbox);
+
+    my $cond = {
+        xmin    => $xmin, 
+        ymin    => $ymin, 
+        xmax    => $xmax,
+        ymax    => $ymax,
+    };
+ 
     my $view_rs = $c->stash->{view_rs};
   
-    $view_rs = $view_rs->as_centroid_of_admin($admin);
+#    $view_rs = $view_rs->as_centroid_of_admin($admin);
+    $view_rs = $view_rs->group_within_bbox(
+        $admin,
+        $cond,
+    );
 
     $c->log->debug('Hits: ',$view_rs->count()); 
 

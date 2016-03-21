@@ -11,8 +11,8 @@ angular.module('vedutaApp')
   .factory('viewservice', function ($http, $q, searchParams) {
 
     var factory = {};
-    var urlBase = 'http://pc1011406020.uni-regensburg.de/veduta-srv';
-//    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+//    var urlBase = 'http://pc1011406020.uni-regensburg.de/veduta-srv';
+    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
 
     factory.getList = function () {
 
