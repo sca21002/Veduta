@@ -1,6 +1,6 @@
-/ubr_geo_*.*
-/UBR-Geo-*
+/veduta_*.*
+/Veduta-*
 .build
 *.log
 *.swp
-/data/*
+/data
