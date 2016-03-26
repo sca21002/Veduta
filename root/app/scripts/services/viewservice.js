@@ -12,7 +12,7 @@ angular.module('vedutaApp')
 
     var factory = {};
 //    var urlBase = 'http://pc1011406020.uni-regensburg.de/veduta-srv';
-    var urlBase = 'http://pc1011406020.uni-regensburg.de:8888';
+    var urlBase = 'http://pc1021600814:8888';
 
     factory.getList = function () {
 

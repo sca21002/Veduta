@@ -17,7 +17,7 @@ angular.module('vedutaApp')
           zoom: 8,
           bounds: []
         },
-        page: 1
+//        page: 1
     };
 
     var factory = {};
@@ -30,13 +30,13 @@ angular.module('vedutaApp')
         angular.extend(data.center, center);
     };
 
-    factory.getPage = function() {
-        return data.page;
-    };
-
-    factory.setPage = function(page) {
-        data.page = page;
-    };
+//    factory.getPage = function() {
+//        return data.page;
+//    };
+//
+//    factory.setPage = function(page) {
+//        data.page = page;
+//    };
 
     return factory;
   

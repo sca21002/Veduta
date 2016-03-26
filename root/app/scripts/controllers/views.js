@@ -24,28 +24,11 @@ angular.module('vedutaApp')
       color: '#3399CC',
       width: 1.25
     });
-//    var styles = 
-//      new ol.style.Style({
-//       image: new ol.style.Circle({
-//          fill: fill,
-//          stroke: stroke,
-//          radius: 5
-//        }),
-//        fill: fill,
-//        stroke: stroke
-//      });
-
-
-//    var myText = new ol.style.Text({
-//        text: 'view_count',
-//        fill: fill,
-//        stroke: stroke
-//    });
 
     var customStyleFunction = function(feature) {
         return [new ol.style.Style({
             text: new ol.style.Text({
-                text: feature.get('view_count'),
+                text: feature.get('view_count').toString(),
                 fill: new ol.style.Fill({
                     color: '#000'
                 }),
@@ -80,36 +63,15 @@ angular.module('vedutaApp')
           ]
         }
       },
-      view_points: {
+      viewpoints: {
         name: 'views',  
         source: {
           type: 'GeoJSON',
 //          url:  'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/gmd',
-          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
+//          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
+          url:  'http://pc1021600814:8888/view/group_by/gmd',
         },
         style:  customStyleFunction
-//        {
-//                    fill: {
-//                        color: '#FF0000'
-//                    },
-//                    stroke: {
-//                        color: '#FFFFFF',
-//                        width: 3
-//                    },
-//                        image: {
-//                            circle: {
-//                                fill: {
-//                                    color: 'rgba(255,255,255,0.4)'
-//                                },
-//                                stroke: {
-//                                    width: 5,
-//                                    color: '#3399CC'
-//                                },
-//                                radius: 14
-//                            }        
-//                        },
-//                        text: myText
-//        }
       },
       attrib: { 
           collapsible: false
@@ -119,55 +81,77 @@ angular.module('vedutaApp')
       }
     });   
 
-    function getViews() {
-        viewservice.getList().then(
-             function(data){
-                console.log('My Total views: ', data.views_total);
-                $scope.views = data.views;
-                $scope.currentPage = data.page;
-                $scope.totalViews = data.views_total;
-                angular.forEach($scope.views, function(view) {
-                  view.icon = thumbnailURL(view.pid);
-                });
-             }
-         );
+    function updateList() {
+
+        olData.getMap().then(function(map) {
+            $scope.currentPage = 1;
+            $scope.itemsPerPage = 5;	    
+	    var view = map.getView();
+            var extent = view.calculateExtent( map.getSize() );	    
+            var layers = map.getLayers();
+            layers.forEach(function(layer) {
+                if (layer.get('name') === 'views') {
+                    var source = layer.getSource();
+		    $scope.views = [];
+                    var features_raw = source.getFeatures();
+		    console.log('Zahl (roh): ', features_raw.length);
+                    var features =  source.getFeaturesInExtent(extent);
+		    console.log('Zahl: ', features.length, ' extent: ', extent);
+		    features.forEach(function(feature) {
+			 $scope.views.push({title: feature.get('admin')});   
+	            });
+                }		
+	    });	
+	    $scope.totalViews = $scope.views.length;
+	});        	
     }
 
 
-    $scope.$watch('center.bounds', function() {
-            console.log('Bounds: ',$scope.center.bounds);
-            searchParams.setCenter(center);
-            $scope.currentPage = 1;
-            searchParams.setPage($scope.currentPage);
-            getViews();
-    });
-
-    $scope.$watch('center.zoom', function() {
-        console.log('Zoom geändert: ', $scope.center.zoom);
-        console.log($scope.view_points.source.url);
-        if ($scope.center.zoom >= 12) {
+    function getViews(zoom) {
+        console.log($scope.viewpoints.source.url);
+        if (zoom >= 12) {
             $scope.admin = 'place';
-        } else if ($scope.center.zoom >= 9) {
+        } else if (zoom >= 9) {
             $scope.admin = 'gmd';
-        } else if ($scope.center.zoom >= 7) { 
+        } else if (zoom >= 7) { 
             $scope.admin = 'lkr';
-        } else if ($scope.center.zoom >= 5) { 
+        } else if (zoom >= 5) { 
             $scope.admin = 'regbez';
         } else {
            $scope.admin = 'bundesland';
         }
-//        $scope.view_points.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
-        $scope.view_points.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
+//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
+//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
+        $scope.viewpoints.source.url = 'http://pc1021600814:8888/view/group_by/' + $scope.admin;
+    }	    
+
+    $scope.$on('openlayers.geojson.ready', function() {
+	console.log('Botschaft von service: layer ready');
+	updateList();
+    });
+
+    $scope.$watch('center.bounds', function() {
+            console.log('Watch Bounds: ',$scope.center.bounds);
+            searchParams.setCenter(center);
+            $scope.currentPage = 1;
+//            searchParams.setPage($scope.currentPage);
+            updateList();
+    });
+
+    $scope.$watch('center.zoom', function() {
+        console.log('Watch Zoom : ', $scope.center.zoom);
+	getViews($scope.center.zoom);
     });
 
 
 
-    $scope.pageChanged = function() {
-        if ( $scope.currentPage !== searchParams.getPage() ) {
-            searchParams.setPage($scope.currentPage);
-            getViews();
-        }    
-    };
+//    $scope.pageChanged = function() {
+//	console.log('Watch page');    
+//        if ( $scope.currentPage !== searchParams.getPage() ) {
+//            searchParams.setPage($scope.currentPage);
+//             updateList();
+//        }    
+//    };
 
 
     $scope.open = function(view) {
@@ -259,8 +243,8 @@ angular.module('vedutaApp')
 
 
 
-
     olData.getMap().then(function(map) {    
+	console.log('In addOverlay');    
         map.addOverlay(overlay);
         map.on('pointermove', function(event) {
             map.forEachFeatureAtPixel(event.pixel, function(feature) {

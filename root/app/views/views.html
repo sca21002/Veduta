@@ -2,7 +2,7 @@
   <div class="col-md-7">
     <openlayers  ol-center="center" width="100%" height="400px" custom-layers="true">
        <ol-layer ol-layer-properties="mapbox"></ol-layer>
-       <ol-layer ol-layer-properties="view_points"></ol-layer>
+       <ol-layer ol-layer-properties="viewpoints"></ol-layer>
     </openlayers>
   </div>
   <div class="col-md-5">
@@ -28,7 +28,7 @@
         </tr>    
       </tfoot>    
       <tbody>    
-      <tr ng-repeat="view in views" ng-mouseenter="hover(view)" ng-click="open(view)">
+      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-click="open(view)">
           <td><img class="thumbnail-view" ng-src="{{view.icon}}"/></td> 
           <td class="view-row">{{view.title}} </td>  
       </tr>

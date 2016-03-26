@@ -36,7 +36,8 @@ sub index :Path :Args(0) {
 }
 
 sub base :Chained('/') PathPart('') CaptureArgs(0) {
-
+    my ( $self, $c ) = @_;
+    $c->log->debug('JSON: ', $JSON::MaybeXS::JSON);
 }
 
 =head2 default
