@@ -98,7 +98,20 @@ angular.module('vedutaApp')
                     var features =  source.getFeaturesInExtent(extent);
 		    console.log('Zahl: ', features.length, ' extent: ', extent);
 		    features.forEach(function(feature) {
-			 $scope.views.push({title: feature.get('admin')});   
+                         if ($scope.admin === 'place') {
+		             var titles = angular.fromJson(feature.get('title'));
+			     var pids   = angular.fromJson(feature.get('pid'));
+			     var years  = angular.fromJson(feature.get('year'));
+			     if (angular.isArray(titles) && angular.isArray(pids) && angular.isArray(years) &&
+	                         titles.length === pids.length && titles.length == years.length) {
+			         titles.forEach(function(title,i) {
+		                     $scope.views.push({ title: title, icon: thumbnailURL(pids[i]) });			 
+			         });		 
+                             }				     
+			     console.log('Views: ',$scope.views);
+                         } else {				 
+			     $scope.views.push({title: feature.get('name')});   
+			 }     
 	            });
                 }		
 	    });	
