@@ -122,16 +122,16 @@ angular.module('vedutaApp')
 
     function getViews(zoom) {
         console.log($scope.viewpoints.source.url);
-        if (zoom >= 12) {
+        if (zoom >= 13) {
             $scope.admin = 'place';
-        } else if (zoom >= 9) {
+        } else if (zoom >= 10) {
             $scope.admin = 'gmd';
-        } else if (zoom >= 7) { 
+        } else if (zoom >= 8) { 
             $scope.admin = 'lkr';
-        } else if (zoom >= 5) { 
+        } else if (zoom >= 6) { 
             $scope.admin = 'regbez';
         } else {
-           $scope.admin = 'bundesland';
+           $scope.admin = 'bundlan';
         }
 //        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
 //        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;

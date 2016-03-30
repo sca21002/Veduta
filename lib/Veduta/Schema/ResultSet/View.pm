@@ -61,15 +61,15 @@ sub as_centroid_of_admin {
         $attrs->{group_by} = [ 'geom' ];
     } else {
         $attrs->{'select'} = [ 
-            \"ST_AsGeoJSON(ST_TRANSFORM(ST_CENTROID($admin.geom),3857))", 
+            \"ST_AsGeoJSON(centroid)", 
             "$admin." . $bez{$admin},
-            { count => "$admin.geom" },
+            { count => "$admin.centroid" },
         ];
         $attrs->{'as'} = [
             'geom', 'name' ,'view_count'
         ];
         $attrs->{join} = $admin;
-        $attrs->{group_by} = ["$admin.geom", "$admin." . $bez{$admin}];
+        $attrs->{group_by} = ["$admin.centroid", "$admin." . $bez{$admin}];
     }    
     return $self->search(
       $cond,

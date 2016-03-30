@@ -21,22 +21,22 @@ angular
   ])
   .config(function ($routeProvider) {
     $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl',
-        controllerAs: 'main'
-      })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'about'
-      })
+//      .when('/', {
+//        templateUrl: 'views/main.html',
+//        controller: 'MainCtrl',
+//        controllerAs: 'main'
+//      })
+//      .when('/about', {
+//        templateUrl: 'views/about.html',
+//        controller: 'AboutCtrl',
+//        controllerAs: 'about'
+//      })
       .when('/views', {
         templateUrl: 'views/views.html',
         controller: 'ViewsCtrl',
         controllerAs: 'views'
       })
       .otherwise({
-        redirectTo: '/'
+        redirectTo: '/views'
       });
   });
