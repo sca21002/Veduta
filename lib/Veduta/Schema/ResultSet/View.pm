@@ -51,9 +51,9 @@ sub as_centroid_of_admin {
 
     if ($admin eq 'place') {
         $attrs->{'select'} = [
-	    \'json_agg(title)',
-	    \'json_agg(pid)',
-	    \'json_agg(year)',
+	        \'json_agg(title)',
+	        \'json_agg(pid)',
+	        \'json_agg(year)',
             \'ST_AsGeoJSON(geom)',
             { count => 'geom' },
         ];   
@@ -61,15 +61,19 @@ sub as_centroid_of_admin {
         $attrs->{group_by} = [ 'geom' ];
     } else {
         $attrs->{'select'} = [ 
+            "${admin}_id",
             \"ST_AsGeoJSON(centroid)", 
             "$admin." . $bez{$admin},
-            { count => "$admin.centroid" },
+            "$admin.adm",
+            { count => "${admin}_id" },
+            \'json_agg(pid)',
+            \"ST_AsGeoJSON($admin.bbox)",
         ];
         $attrs->{'as'} = [
-            'geom', 'name' ,'view_count'
+            'id', 'geom', 'name' , 'adm', 'view_count', 'pid', 'bbox',
         ];
         $attrs->{join} = $admin;
-        $attrs->{group_by} = ["$admin.centroid", "$admin." . $bez{$admin}];
+        $attrs->{group_by} = ["${admin}_id",  "$admin.centroid", "$admin." . $bez{$admin}, "$admin.adm", "$admin.bbox"];
     }    
     return $self->search(
       $cond,

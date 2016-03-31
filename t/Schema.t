@@ -118,24 +118,24 @@ my $rs;
 #    
 #}
 
-$rs = $schema->resultset('View')->group_within_bbox(
-    'bundlan',
-    {
-        xmin => 11.136,
-        ymin => 49.6871,
-        xmax => 11.9972,
-        ymax => 50.1916,
-    },
-);
-
-diag '===============================';
-
-while (my $row = $rs->next) {
-    diag join(' ', 
-        $row->get_column('admin'),  
-        $row->get_column('view_count'),
-         $row->get_column('geom'),
-    );
-}
+#$rs = $schema->resultset('View')->group_within_bbox(
+#    'bundlan',
+#    {
+#        xmin => 11.136,
+#        ymin => 49.6871,
+#        xmax => 11.9972,
+#        ymax => 50.1916,
+#    },
+#);
+#
+#diag '===============================';
+#
+#while (my $row = $rs->next) {
+#    diag join(' ', 
+#        $row->get_column('admin'),  
+#        $row->get_column('view_count'),
+#         $row->get_column('geom'),
+#    );
+#}
 
 done_testing();

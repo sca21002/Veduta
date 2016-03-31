@@ -1,5 +1,7 @@
 package Veduta::Model::VedutaDB;
 
+# ABSTRACT: Model for Veduta Database 
+
 use strict;
 use base 'Catalyst::Model::DBIC::Schema';
 

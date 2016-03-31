@@ -1,4 +1,7 @@
 package Veduta::Controller::Root;
+
+# ABSTRACT: Root Controller 
+
 use Moose;
 use namespace::autoclean;
 
