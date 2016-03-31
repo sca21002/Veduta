@@ -9,7 +9,7 @@ sub encode_json {
     my($self, $c) = @_;
 
     my $fcol = $c->stash->{feature_collection};
-    $c->log->debug($fcol);
+    # $c->log->debug($fcol);
     return $fcol->to_json;
 }
 

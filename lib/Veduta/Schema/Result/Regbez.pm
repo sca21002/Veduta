@@ -220,6 +220,35 @@ __PACKAGE__->has_many(
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:KeYy5UxX9EZvpKTokpG7vQ
 
 
+use Geo::JSON;
+use Geo::JSON::Feature;
+
+sub as_feature_object {
+    my $self = shift;
+
+
+    # FIX: name geom is fixed, should be made variable
+    my $geometry_object = Geo::JSON->from_json(
+        $self->get_column('geom')
+    );
+
+    my %properties =  $self->get_inflated_columns;
+    foreach my $geometry_column ($self->geometry_columns) {
+        delete $properties{$geometry_column};
+    }
+
+    return Geo::JSON::Feature->new({
+        geometry   => $geometry_object,
+        properties => \%properties,
+    });
+}
+
+sub geometry_columns {
+    my %columns = %{ shift->result_source->columns_info };
+    grep { $columns{$_}{data_type} eq 'geometry' } keys(%columns);
+}
+
+
 # You can replace this text with custom code or comments, and it will be preserved on regeneration
 __PACKAGE__->meta->make_immutable;
 1;

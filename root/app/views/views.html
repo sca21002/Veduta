@@ -2,6 +2,7 @@
   <div class="col-md-7">
     <openlayers  ol-center="center" width="100%" height="400px" custom-layers="true">
        <ol-layer ol-layer-properties="mapbox"></ol-layer>
+       <ol-layer ol-layer-properties="boundingbox"></ol-layer>
        <ol-layer ol-layer-properties="viewpoints"></ol-layer>
     </openlayers>
   </div>
@@ -10,7 +11,7 @@
       <thead> 
         <tr>
           <td colspan="2">
-    <div class="text-right">Zoom: {{center.zoom}} - Cluster: {{admin}} - Ansichten: {{totalViews}} Seite: {{currentPage}}/{{numPages}}</div>
+    <div class="text-right">Zoom: {{center.zoom}} - Ebene: {{admin_long}} - Ansichten: {{totalViews}} Seite: {{currentPage}}/{{numPages}}</div>
         </td>    
       </thead>
       <tfoot>
@@ -18,9 +19,9 @@
           <td colspan="2" class="text-center">
             <pagination 
               ng-model="currentPage" 
+              items-per-page ="itemsPerPage"
               total-items="totalViews"
               max-size = 6
-              items-per-page = 5
               num-pages="numPages"
               ng-change="pageChanged()"
             ></pagination>
@@ -28,9 +29,9 @@
         </tr>    
       </tfoot>    
       <tbody>    
-      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-click="open(view)">
+      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="open(view)">
           <td><img class="thumbnail-view" ng-src="{{view.icon}}"/></td> 
-          <td class="view-row">{{view.title}} </td>  
+          <td class="view-row" ng-click="zoomIn(view)">{{view.title}}<br/>{{view.viewCount}}</td>  
       </tr>
       </tbody>  
   </div>
