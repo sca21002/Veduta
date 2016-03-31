@@ -113,8 +113,8 @@ angular.module('vedutaApp')
         name: 'views',  
         source: {
           type: 'GeoJSON',
-//          url:  'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/gmd',
-          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
+          url:  'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/gmd',
+//          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
 //          url:  'http://pc1021600814:8888/view/group_by/gmd',
         },
         style:  customStyleFunction
@@ -212,8 +212,8 @@ angular.module('vedutaApp')
         }
         $scope.admin_long = getNameFromAdmin($scope.admin);
 //        $scope.admin_long = getNameFromAdmin($sope.admin);
-//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
-        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
+        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
+//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
 //        $scope.viewpoints.source.url = 'http://pc1021600814:8888/view/group_by/' + $scope.admin;
     }	    
 
