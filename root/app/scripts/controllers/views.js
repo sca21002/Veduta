@@ -88,10 +88,6 @@ angular.module('vedutaApp')
     };
 
 
-        
-
-
-
     angular.extend( $scope, {
       center: center,
       admin: 'gmd',
@@ -187,7 +183,9 @@ angular.module('vedutaApp')
                                 title: getTitle(feature), 
                                 viewCount: getViewCount(feature), 
                                 id: feature.get('id'), 
-                                icon: thumbnailURL(pids[index])});   
+                                icon: thumbnailURL(pids[index]),
+                                pid: pids[index]
+                            });   
 			            }     
 	                });
                 }		
@@ -246,9 +244,11 @@ angular.module('vedutaApp')
 //    };
 
 
-    $scope.open = function(view) {
-        if ($scope.admin !== 'place') { return; }
-        var pid = view.id;
+    $scope.open = function(view, $event) {
+        console.log('Image clicked');
+        $event.stopPropagation();
+        var pid = ($scope.admin === 'place') ? view.id : view.pid;
+        console.log('pid: ', pid);
         $window.open('http://digital.bib-bvb.de/webclient/DeliveryManager?custom_att_2=simple_viewer&custom_att_1=test&pid=' + pid);
     };
 
@@ -288,8 +288,8 @@ angular.module('vedutaApp')
 //        });
 //    }
     
-//    $scope.zoomIn = function(view) {
-//        console.log('zoomIn clicked');
+    $scope.zoomIn = function(view) {
+        console.log('zoomIn clicked', view);
 //        if ($scope.admin === 'place') {
 //            $scope.open(view);
 //        } else {
@@ -337,8 +337,8 @@ angular.module('vedutaApp')
 //                }
 //            });
 //        }
-//    }
-//
+    };
+
 
     var selectedFeatures = [];
 

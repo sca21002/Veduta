@@ -29,9 +29,9 @@
         </tr>    
       </tfoot>    
       <tbody>    
-      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="open(view)">
-          <td><img class="thumbnail-view" ng-src="{{view.icon}}"/></td> 
-          <td class="view-row" ng-click="zoomIn(view)">{{view.title}}<br/>{{view.viewCount}}</td>  
+      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="zoomIn(view)">
+          <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="open(view, $event)"/></td> 
+          <td class="view-row">{{view.title}}<br/>{{view.viewCount}}</td>  
       </tr>
       </tbody>  
   </div>
