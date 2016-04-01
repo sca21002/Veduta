@@ -11,7 +11,7 @@
 /*global ol*/
 
 angular.module('vedutaApp')
-  .controller('ViewsCtrl', function ($scope, $window, olData, searchParams, viewservice, thumbnailURL) {
+  .controller('ViewsCtrl', function ($scope, $window, olData, searchParams, viewservice, thumbnailURL, adminservice) {
 
     var center;
 
@@ -109,8 +109,8 @@ angular.module('vedutaApp')
         name: 'views',  
         source: {
           type: 'GeoJSON',
-          url:  'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/gmd',
-//          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
+//          url:  'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/gmd',
+          url:  'http://pc1011406020.uni-regensburg.de:8888/view/group_by/gmd',
 //          url:  'http://pc1021600814:8888/view/group_by/gmd',
         },
         style:  customStyleFunction
@@ -134,7 +134,16 @@ angular.module('vedutaApp')
             },  
             // projection: 'EPSG:3857'
           }
-        }
+        },
+        style: new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: [255,255,255,0]
+            }),
+            stroke: new ol.style.Stroke({
+                color: [224,51,51,0.7],
+                width: 1
+            })
+        }),
       },
       attrib: { 
           collapsible: false
@@ -210,8 +219,8 @@ angular.module('vedutaApp')
         }
         $scope.admin_long = getNameFromAdmin($scope.admin);
 //        $scope.admin_long = getNameFromAdmin($sope.admin);
-        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
-//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
+//        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de/veduta-srv/view/group_by/' + $scope.admin;
+        $scope.viewpoints.source.url = 'http://pc1011406020.uni-regensburg.de:8888/view/group_by/' + $scope.admin;
 //        $scope.viewpoints.source.url = 'http://pc1021600814:8888/view/group_by/' + $scope.admin;
     }	    
 
@@ -252,92 +261,92 @@ angular.module('vedutaApp')
         $window.open('http://digital.bib-bvb.de/webclient/DeliveryManager?custom_att_2=simple_viewer&custom_att_1=test&pid=' + pid);
     };
 
-//    function getLayer(name) {
-//        return olData.getMap().then(function(map) {
-//            var layers = map.getLayers();
-//            var layer;
-//            layers.forEach(function(lyr) {
-//                if (lyr.get('name') === name) {
-//                    layer = lyr;
-//                }
-//            });
-//            return layer;
-//        });
-//    }
-     
-//    function getFeature(id) {
-//        return getLayer('views').then(function(layer) {
-//            var source = layer.getSource();
-//            var features =  source.getFeatures();
-//            var feature;
-//            features.forEach(function(ftr) {
-//                if ($scope.admin === 'place') {
-//                    var pids   = angular.fromJson(ftr.get('pid'));
-//                    pids.forEach(function(pid) {
-//                        if (pid === id) { 
-//                            feature = ftr; 
-//                        }    
-//                    });
-//                } else {
-//                    if (ftr.get('id') === id) {
-//                        feature = ftr;
-//                    }
-//                }     
-//            });
-//            return feature;
-//        });
-//    }
+    function getLayer(name) {
+        return olData.getMap().then(function(map) {
+            var layers = map.getLayers();
+            var layer;
+            layers.forEach(function(lyr) {
+                if (lyr.get('name') === name) {
+                    layer = lyr;
+                }
+            });
+            return layer;
+        });
+    }
+   
+    function getFeature(id) {
+        return getLayer('views').then(function(layer) {
+            var source = layer.getSource();
+            var features =  source.getFeatures();
+            var feature;
+            features.forEach(function(ftr) {
+                if ($scope.admin === 'place') {
+                    var pids   = angular.fromJson(ftr.get('pid'));
+                    pids.forEach(function(pid) {
+                        if (pid === id) { 
+                            feature = ftr; 
+                        }    
+                    });
+                } else {
+                    if (ftr.get('id') === id) {
+                        feature = ftr;
+                    }
+                }     
+            });
+            return feature;
+        });
+    }
     
-    $scope.zoomIn = function(view) {
-        console.log('zoomIn clicked', view);
-//        if ($scope.admin === 'place') {
-//            $scope.open(view);
-//        } else {
-//            var view_id = view.id;
-//            console.log('Start zoomIn mit view_id: ', view_id);
-//            getLayer('views').then(function(layer) {
-//                getFeature(view_id).then(function(feature){
-//                    console.log('feature found in getFeature: ', feature);
-//                });
-//                var source = layer.getSource();
-//                var features =  source.getFeatures();
-//                var feature;
-//                features.forEach(function(ftr) {
-//                    if ($scope.admin === 'place') {
-//                        var pids   = angular.fromJson(ftr.get('pid'));
-//                        pids.forEach(function(pid) {
-//                            if (pid === id) { 
-//                                feature = ftr; 
-//                            }    
-//                        });
-//                    } else {
-//                        if (ftr.get('id') === view_id) {
-//                            feature = ftr;
-//                        }
-//                    }     
-//                });
-//                if (angular.isDefined(feature)) {
-//                    console.log('Treffer: ', feature);
-//                    adminservice.getBoundary($scope.admin,view_id).then(function(geoJSON){ 
-//                        $scope.boundingbox.source.geojson.object = geoJSON;
-//                    });
-//                    var bbox = angular.fromJson(feature.get('bbox'));
-//                    console.log('BBox: ', bbox);
-//                    var xmin = bbox.coordinates[0][0][0];
-//                    var ymin = bbox.coordinates[0][0][1];
-//                    var xmax = bbox.coordinates[0][2][0];
-//                    var ymax = bbox.coordinates[0][2][1];
-//                    console.log('xmin: ', xmin);
-//                    console.log('ymin: ', ymin);
-//                    console.log('xmax: ', xmax);
-//                    console.log('ymax: ', ymax);
-//                    olData.getMap().then(function(map) {
-//                        map.getView().fit([xmin,ymin,xmax,ymax], map.getSize());
-//                    });    
-//                }
-//            });
-//        }
-    };
+    $scope.zoomIn = function(view,$event) {
+        console.log('zoomIn clicked');
+        if ($scope.admin === 'place') {
+            $scope.open(view, $event);
+        } else {
+            var view_id = view.id;
+            console.log('Start zoomIn mit view_id: ', view_id);
+            getLayer('views').then(function(layer) {
+                getFeature(view_id).then(function(feature){
+                    console.log('feature found in getFeature: ', feature);
+                });
+                var source = layer.getSource();
+                var features =  source.getFeatures();
+                var feature;
+                features.forEach(function(ftr) {
+                    if ($scope.admin === 'place') {
+                        var pids   = angular.fromJson(ftr.get('pid'));
+                        pids.forEach(function(pid) {
+                            if (pid === id) { 
+                                feature = ftr; 
+                            }    
+                        });
+                    } else {
+                        if (ftr.get('id') === view_id) {
+                            feature = ftr;
+                        }
+                    }     
+                });
+                if (angular.isDefined(feature)) {
+                    console.log('Treffer: ', feature);
+                    adminservice.getBoundary($scope.admin,view_id).then(function(geoJSON){ 
+                        $scope.boundingbox.source.geojson.object = geoJSON;
+                    });
+                    var bbox = angular.fromJson(feature.get('bbox'));
+                    console.log('BBox: ', bbox);
+                    var xmin = bbox.coordinates[0][0][0];
+                    var ymin = bbox.coordinates[0][0][1];
+                    var xmax = bbox.coordinates[0][2][0];
+                    var ymax = bbox.coordinates[0][2][1];
+                    console.log('xmin: ', xmin);
+                    console.log('ymin: ', ymin);
+                    console.log('xmax: ', xmax);
+                    console.log('ymax: ', ymax);
+                    olData.getMap().then(function(map) {
+                        map.getView().fit([xmin,ymin,xmax,ymax], map.getSize());
+                    });    
+                }
+            });
+        }
+    }
 
 
     var selectedFeatures = [];

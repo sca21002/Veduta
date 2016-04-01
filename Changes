@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Zoom to administrative unit
+
 0.02      2016-04-01 09:29:09+02:00 Europe/Berlin
 
     - Open link to repo by clicking on thumbnail

@@ -29,7 +29,7 @@
         </tr>    
       </tfoot>    
       <tbody>    
-      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="zoomIn(view)">
+      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="zoomIn(view, $event)">
           <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="open(view, $event)"/></td> 
           <td class="view-row">{{view.title}}<br/>{{view.viewCount}}</td>  
       </tr>
