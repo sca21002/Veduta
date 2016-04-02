@@ -23,6 +23,10 @@
     height: 25px;
 }
 
+#ccby {
+    height: 10px;
+}
+
 .pagination > .active > a,
 .pagination > .active > span,
 .pagination > .active > a:hover,
