@@ -97,6 +97,18 @@ angular.module('vedutaApp')
         });
     }
     
+    function getAdminFeatures() {
+        return getLayer('boundaries').then(function(layer) {
+            if (angular.isDefined(layer)) {
+                var source = layer.getSource();
+                var features =  source.getFeatures();
+                return features;
+            } else {
+                return;
+            }
+        });
+    }
+    
 
     angular.extend( $scope, {
       center: center,
@@ -172,11 +184,9 @@ angular.module('vedutaApp')
                 if (layer.get('name') === 'views') {
                     var source = layer.getSource();
 		            $scope.views = [];
-                    var features_raw = source.getFeatures();
-		            console.log('Zahl (roh): ', features_raw.length);
+                    var rest = [];
                     var features =  source.getFeaturesInExtent(extent);
-		            console.log('Zahl: ', features.length, ' extent: ', extent);
-		            features.forEach(function(feature) {
+                    features.forEach(function(feature) {
                         var pids;
                         if ($scope.admin === 'place') {
 		                    var titles = angular.fromJson(feature.get('title'));
@@ -185,41 +195,89 @@ angular.module('vedutaApp')
 			                if (angular.isArray(titles) && angular.isArray(pids) && angular.isArray(years) &&
                                 titles.length === pids.length && titles.length === years.length) {
 			                    titles.forEach(function(title,i) {
-		                            $scope.views.push({ title: title, icon: thumbnailURL(pids[i]), id: pids[i] });			 
-			                    });		 
+                                    if ($scope.adminUnitSelected && 
+                                        ($scope.admin === $scope.adminUnitSelected.admin && 
+                                         feature.get('name') === $scope.adminUnitSelected.name) ||     
+                                        ($scope.admin !== $scope.adminUnitSelected.admin && 
+                                         feature.get($scope.adminUnitSelected.admin) === $scope.adminUnitSelected.name)) {
+    		                            $scope.views.push({
+                                            title: title, 
+                                            icon: thumbnailURL(pids[i]), 
+                                            id: pids[i],
+                                            gmd: feature.get('gmd'),
+                                            lkr: feature.get('lkr'),
+                                            regbez: feature.get('regbez')
+                                        });			 
+                                        // console.log('Selected: ', title); 
+                                    }  else {
+    		                            rest.push({
+                                            title: title, 
+                                            icon: thumbnailURL(pids[i]), 
+                                            id: pids[i],
+                                            gmd: feature.get('gmd'),
+                                            lkr: feature.get('lkr'),
+                                            regbez: feature.get('regbez')
+                                        });			 
+                
+                                    }
+                                });    
                             }				     
-			                // console.log('Views: ',$scope.views);
                         } else {	
                             pids   = angular.fromJson(feature.get('pid'));
                             var index = getRandomPid(pids.length);
-			                $scope.views.push({
+                            var set = {
                                 title: adminUnitService.getFullName(
                                     feature.get('name'), 
                                     $scope.admin, 
                                     feature.get('adm')
-                                ), 
+                                ),
+                                name: feature.get('name'), 
+                                admin: $scope.admin,
                                 viewCount: getViewCount(feature), 
                                 id: feature.get('id'), 
                                 icon: thumbnailURL(pids[index]),
                                 pid: pids[index]
-                            });   
+                            };
+                            if ($scope.admin === 'lkr' || $scope.admin === 'gmd') {
+                                set.regbez = feature.get('regbez'); 
+                            }
+                            if ($scope.admin === 'gmd') {
+                                set.lkr = feature.get('lkr');
+                            }
+                            if ($scope.adminUnitSelected && feature.get($scope.adminUnitSelected.admin) === $scope.adminUnitSelected.name) {
+			                    $scope.views.push(set);
+                                // console.log('Selected: ', set.title); 
+                            } else {
+                                rest.push(set);
+                            }
 			            }     
 	                });
+                    $scope.views = $scope.views.concat(rest);
                 }		
 	        });	
-	        $scope.totalViews = $scope.views.length;
-            var controls = map.getControls();
-            controls.forEach(function(control){
-                console.log('Control: ', control);
-            });
-     
-             
+            $scope.totalViews = $scope.views.length;
 	    });        	
     }
 
 
-    function getViews(zoom) {
-        console.log($scope.viewpoints.source.url);
+    function getViews(adminUnit) {
+        $scope.admin_long = adminUnitService.getAdminUnitName(adminUnit);
+        $scope.viewpoints.source.url = vedutaService.viewpointsSourceURL(adminUnit);
+    }	    
+
+    $scope.$on('openlayers.geojson.ready', function() {
+	    updateList();
+    });
+
+    $scope.$watch('center.bounds', function() {
+        searchParams.setCenter(center);
+        $scope.currentPage = 1;
+        updateList();
+    });
+
+    $scope.$watch('center.zoom', function() {
+        var zoom = $scope.center.zoom;
+        var adminUnit = $scope.admin;
         if (zoom >= 13) {
             $scope.admin = 'place';
         } else if (zoom >= 10) {
@@ -231,37 +289,10 @@ angular.module('vedutaApp')
         } else {
            $scope.admin = 'bundlan';
         }
-        $scope.admin_long = adminUnitService.getAdminUnitName($scope.admin);
-        $scope.viewpoints.source.url = vedutaService.viewpointsSourceURL($scope.admin);
-    }	    
-
-    $scope.$on('openlayers.geojson.ready', function() {
-	console.log('Botschaft von service: layer ready');
-	updateList();
+        if (adminUnit !== $scope.admin) {
+	        getViews($scope.admin);
+        }    
     });
-
-    $scope.$watch('center.bounds', function() {
-            console.log('Watch Bounds: ',$scope.center.bounds);
-            searchParams.setCenter(center);
-            $scope.currentPage = 1;
-//            searchParams.setPage($scope.currentPage);
-            updateList();
-    });
-
-    $scope.$watch('center.zoom', function() {
-        console.log('Watch Zoom : ', $scope.center.zoom);
-	getViews($scope.center.zoom);
-    });
-
-
-
-//    $scope.pageChanged = function() {
-//	console.log('Watch page');    
-//        if ( $scope.currentPage !== searchParams.getPage() ) {
-//            searchParams.setPage($scope.currentPage);
-//             updateList();
-//        }    
-//    };
 
 
     $scope.open = function(view, $event) {
@@ -271,52 +302,48 @@ angular.module('vedutaApp')
     };
 
     $scope.zoomIn = function(view,$event) {
-        console.log('zoomIn clicked');
         if ($scope.admin === 'place') {
             $scope.open(view, $event);
         } else {
             var view_id = view.id;
-            console.log('Start zoomIn mit view_id: ', view_id);
-            getLayer('views').then(function(layer) {
-                getFeature(view_id).then(function(feature){
-                    console.log('feature found in getFeature: ', feature);
-                });
-                var source = layer.getSource();
-                var features =  source.getFeatures();
-                var feature;
-                features.forEach(function(ftr) {
-                    if ($scope.admin === 'place') {
-                        var pids   = angular.fromJson(ftr.get('pid'));
-                        pids.forEach(function(pid) {
-                            if (pid === view_id) { 
-                                feature = ftr; 
-                            }    
-                        });
-                    } else {
-                        if (ftr.get('id') === view_id) {
-                            feature = ftr;
+            console.log('View_id: ', view_id);
+            getFeature(view_id).then(function(feature){
+                getAdminFeatures().then(function(admin_features) {
+                    var is_admin_limits = false;
+                    if (angular.isDefined(admin_features && admin_features[0])) {
+                         console.log('admin features found: ', admin_features.length);
+                        var admin_id = admin_features[0].get('admin_id');
+                        console.log('adminUnit (id): ', admin_id);
+                        console.log('View_id: ', view_id);
+                        is_admin_limits = admin_id === view_id;
+                        if (is_admin_limits) { 
+                            console.log('Ids identisch');
                         }
-                    }     
-                });
-                if (angular.isDefined(feature)) {
-                    console.log('Treffer: ', feature);
-                    vedutaService.getBoundary($scope.admin,view_id).then(function(geoJSON){ 
-                        $scope.boundingbox.source.geojson.object = geoJSON;
-                    });
+                    }
                     var bbox = angular.fromJson(feature.get('bbox'));
-                    console.log('BBox: ', bbox);
                     var xmin = bbox.coordinates[0][0][0];
                     var ymin = bbox.coordinates[0][0][1];
                     var xmax = bbox.coordinates[0][2][0];
                     var ymax = bbox.coordinates[0][2][1];
-                    console.log('xmin: ', xmin);
-                    console.log('ymin: ', ymin);
-                    console.log('xmax: ', xmax);
-                    console.log('ymax: ', ymax);
                     olData.getMap().then(function(map) {
-                        map.getView().fit([xmin,ymin,xmax,ymax], map.getSize());
-                    });    
-                }
+                        var extent = map.getView().calculateExtent(map.getSize());
+                        console.log('Extent (calc.) ', extent);
+                        console.log('Extent (bbox)  ', [xmin,ymin,xmax,ymax]);
+                        var width =  Math.round(100 * (extent[2] - extent[0] - (xmax - xmin)) / (extent[2] - extent[0])); 
+                        var height = Math.round(100 * (extent[3] - extent[1] - (ymax - ymin)) / (extent[3] - extent[1]));
+                        console.log('Width, Height diff: ', width, height);    
+                            if (is_admin_limits && ( width > -50  && width < 50 || height > - 50 && height < 50) ) {
+                            $scope.admin = adminUnitService.decreaseAdminUnit($scope.admin);
+	                        getViews($scope.admin);
+                        } else {
+                            map.getView().fit([xmin,ymin,xmax,ymax], map.getSize(), { nearest: true } );
+                        }
+                    });
+                });
+            });
+            vedutaService.getBoundary($scope.admin,view_id).then(function(geoJSON){ 
+                $scope.boundingbox.source.geojson.object = geoJSON;
+                $scope.adminUnitSelected = { id: view_id, fullname: view.title, name: view.name, admin: view.admin };
             });
         }
     };
@@ -335,72 +362,39 @@ angular.module('vedutaApp')
 
     $scope.hover = function(view) {
         var view_id = view.id;
-        console.log('entering view mit ID: ', view_id);
-        olData.getMap().then(function(map) {   
-            var layers = map.getLayers();
-            var layer;
-            layers.forEach(function(lyr) {
-                if (lyr.get('name') === 'views') {
-                    console.log('layer found');
-                    layer = lyr;     
-                }
+        getFeature(view_id).then(function(feature) {
+            var style = new ol.style.Style({
+                text: new ol.style.Text({
+                    text: feature.get('view_count').toString(),
+                    fill: new ol.style.Fill({
+                        color: '#000'
+                    }),
+                }),    
+                fill: new ol.style.Fill({
+                    color: 'rgba(255, 100, 50, 0.3)'
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 2,
+                    color: 'rgba(255, 100, 50, 0.8)'
+                }),
+                image: new ol.style.Circle({
+                    fill: new ol.style.Fill({
+                        color: 'rgba(255,255,255,0.4)'
+                    }),
+                    stroke: new ol.style.Stroke({
+                        width: 5,
+                        color: '#fe3333'
+                    }),
+                    radius: 14
+                })
             });
-            if (angular.isDefined(layer)) {     
-                var source = layer.getSource();
-                var features =  source.getFeatures();
-                var feature;
-                features.forEach(function(ftr) {
-                    if ($scope.admin === 'place') {
-                        var pids   = angular.fromJson(ftr.get('pid'));
-                        pids.forEach(function(pid) {
-                            if (pid === view_id) { 
-                                feature = ftr; 
-                            }    
-                        });
-                    } else {
-                        if (ftr.get('id') === view_id) {
-                            feature = ftr;
-                        }
-                    }     
-                });
-                if (angular.isDefined(feature)) {
-                    console.log('Treffer: ', feature);
-                    var style = new ol.style.Style({
-                        text: new ol.style.Text({
-                            text: feature.get('view_count').toString(),
-                            fill: new ol.style.Fill({
-                                color: '#000'
-                            }),
-                        }),    
-                        fill: new ol.style.Fill({
-                            color: 'rgba(255, 100, 50, 0.3)'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            width: 2,
-                            color: 'rgba(255, 100, 50, 0.8)'
-                        }),
-                        image: new ol.style.Circle({
-                            fill: new ol.style.Fill({
-                                color: 'rgba(255,255,255,0.4)'
-                            }),
-                            stroke: new ol.style.Stroke({
-                                width: 5,
-                                color: '#fe3333'
-                            }),
-                            radius: 14
-                        })
-                    });
-                    feature.setStyle(style);
-                    selectedFeatures.push(feature);
-                }
-            }
+            feature.setStyle(style);
+            selectedFeatures.push(feature);
         });
     };
 
 
-    $scope.unhover = function(view) {
-        var view_id = view.id;
-        console.log('leaving view mit ID: ', view_id);
+    $scope.unhover = function() {
         unselectPreviousFeatures();
     };
 
@@ -426,7 +420,6 @@ angular.module('vedutaApp')
 //                var url = thumbnailURL(pid);
 //                var geometry = feature.getGeometry();
 //                var coordinates = geometry.getCoordinates();
-//                console.log(geometry.getCoordinates());
 //                setCoordinateAndShow(coordinates, title, url, pid);
 //            });    
 //        });

@@ -1,5 +1,6 @@
 <div class="row">
   <div class="col-md-7">
+    <div id="selected" class="text-left">Ausgewählt: {{adminUnitSelected.fullname}}</div>  
     <openlayers  ol-center="center" width="100%" height="400px" custom-layers="true">
        <ol-layer ol-layer-properties="mapbox"></ol-layer>
        <ol-layer ol-layer-properties="boundingbox"></ol-layer>
@@ -24,6 +25,8 @@
               total-items="totalViews"
               max-size = 6
               num-pages="numPages"
+              previous-text="&lt;"
+              next-text="&gt;"
               ng-change="pageChanged()"
             ></pagination>
           </td>    
@@ -32,7 +35,13 @@
       <tbody>    
       <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="zoomIn(view, $event)">
           <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="open(view, $event)"/></td> 
-          <td class="view-row">{{view.title}}<br/>{{view.viewCount}}</td>  
+          <td class="view-row">
+              <div id="title">{{view.title}}</div/>
+              <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
+              <div ng-show="view.lkr">Kreis: {{view.lkr}}</div>
+              <div ng-show="view.regbez">{{view.regbez}}</div>
+              <div>{{view.viewCount}}</div>
+          </td>  
       </tr>
       </tbody>  
   </div>

@@ -46,6 +46,7 @@ sub as_centroid_of_admin {
 	bundlan   => 'bez_lan',
     );
 
+
     $attrs = {} unless ref $attrs eq 'HASH';
 
 
@@ -54,11 +55,16 @@ sub as_centroid_of_admin {
 	        \'json_agg(title)',
 	        \'json_agg(pid)',
 	        \'json_agg(year)',
-            \'ST_AsGeoJSON(geom)',
-            { count => 'geom' },
+            \'ST_AsGeoJSON(me.geom)',
+            { count => 'me.geom' },
+            'gmd.bez_gem', 'gmd.bez_krs', 'gmd.bez_rbz',
+
         ];   
-        $attrs->{'as'} = [ 'title', 'pid', 'year', 'geom' , 'view_count' ];
-        $attrs->{group_by} = [ 'geom' ];
+        $attrs->{'as'} = [ 'title', 'pid', 'year', 'geom' , 'view_count',
+            'gmd', 'lkr', 'regbez',
+        ];
+        $attrs->{group_by} = [ 'me.geom', 'gmd.bez_gem', 'gmd.bez_krs', 'gmd.bez_rbz' ];
+        $attrs->{join} = 'gmd';
     } else {
         $attrs->{'select'} = [ 
             "${admin}_id",
@@ -75,6 +81,21 @@ sub as_centroid_of_admin {
         $attrs->{join} = $admin;
         $attrs->{group_by} = ["${admin}_id",  "$admin.centroid", "$admin." . $bez{$admin}, "$admin.adm", "$admin.bbox"];
     }    
+    if ($admin eq 'lkr' || $admin eq 'gmd' 
+        # || $admin eq 'place') 
+       ){
+        push @{$attrs->{'select'}}, "$admin." . $bez{'regbez'};
+        push @{$attrs->{'as'}},     'regbez';
+        push @{$attrs->{group_by}}, "$admin." . $bez{'regbez'};
+    };
+    if ($admin eq 'gmd' 
+        # || $admin eq 'place') 
+       ){
+        push @{$attrs->{'select'}}, "$admin." . $bez{'lkr'};
+        push @{$attrs->{'as'}},     'lkr';
+        push @{$attrs->{group_by}}, "$admin." . $bez{'lkr'};
+    };
+
     return $self->search(
       $cond,
       $attrs,

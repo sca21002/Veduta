@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Sort list entries from selected admin unit on first position
+
 0.04      2016-04-02 17:16:10+02:00 Europe/Berlin
 
     - Activate Mousewheel, add attribution information

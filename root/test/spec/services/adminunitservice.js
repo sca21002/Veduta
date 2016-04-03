@@ -35,4 +35,14 @@ describe('Service: adminUnitService', function () {
     expect(adminUnitService.getAdminUnitName('test')).toEqual(undefined); 
   });
 
+  it('decrease gmd', function() {
+    expect(adminUnitService.decreaseAdminUnit('gmd')).toEqual('place');
+  });
+
+  it('decrease place', function() {
+    expect(adminUnitService.decreaseAdminUnit('place')).toEqual(undefined);
+  });
+
+
+
 });

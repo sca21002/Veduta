@@ -10,6 +10,9 @@
 angular.module('vedutaApp')
   .factory('adminUnitService', function () {
 
+
+    var adminUnits = [ 'place', 'gmd', 'lkr', 'regbez', 'bayern' ];
+       
     var adminUnitMap = {
         place:  'Ort',
         gmd:    'Gemeinde',
@@ -22,11 +25,25 @@ angular.module('vedutaApp')
     //    4002: 'Landkreis',
     //    4003: 'kreisfreie Stadt'
 
+    //    6003: Stadt
+
+    function decrease(adminUnit) {
+        var index;
+        for (var i = 1; i < adminUnit.length; i++) {
+            if (adminUnit === adminUnits[i]) {
+                index = i -1; break;
+            }
+        }
+        return angular.isDefined(index) ? adminUnits[index] : undefined;  
+    }
+
+
     function buildFullName(name, adminUnit, adm) {
 
         var fullName;
 
-        if (adminUnit === 'gmd') { fullName = adminUnitMap.gmd + ' '; }
+        if (adminUnit === 'gmd' && adm === '6003') { fullName = 'Stadt '; }
+        else if (adminUnit === 'gmd') { fullName = adminUnitMap.gmd + ' '; }
         else if (adminUnit === 'lkr' && adm !== '4003') { fullName = adminUnitMap.lkr + ' '; }
         else {fullName = '';}
         
@@ -39,11 +56,14 @@ angular.module('vedutaApp')
     }
 
     return {
-      getAdminUnitName: function (adminUnit) {
+      getAdminUnitName: function(adminUnit) {
         return adminUnitMap[adminUnit];    
       },
-      getFullName: function (name, adminUnit, administrativeFunction) {
+      getFullName: function(name, adminUnit, administrativeFunction) {
         return buildFullName(name, adminUnit, administrativeFunction);    
+      },
+      decreaseAdminUnit: function(adminUnit) {
+          return decrease(adminUnit);
       }
     };
   });

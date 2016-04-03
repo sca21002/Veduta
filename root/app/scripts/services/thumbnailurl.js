@@ -10,8 +10,7 @@
 angular.module('vedutaApp')
   .factory('thumbnailURL', function () {
     return function (pid) {
-        var url = 'http://digital.bib-bvb.de/webclient/DeliveryManager?pid=';
-        url = url + pid + '&custom_att_2=thumbnailstream';
+        var url = 'http://digipool.bib-bvb.de/bvb/delivery/tn_stream.fpl?pid=' +pid;
         return url;
     };
   });
