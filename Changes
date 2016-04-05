@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Clicking on the list get down to the next deeper admin unit
+
 0.05      2016-04-03 22:00:53+02:00 Europe/Berlin
 
     - Sort list entries from selected admin unit on first position
