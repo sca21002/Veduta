@@ -314,23 +314,24 @@ angular.module('vedutaApp')
 
     // TODO: change function name 
     $scope.zoomIn = function(view, $event) {
-        if ($scope.admin === 'place') {
+        var adminUnit = $scope.admin;
+        if (adminUnit === 'place') {
             $scope.open(view, $event);
         } else {
 
-            // view.admin should be equal to $scope.admin
-                $scope.adminUnitSelected = { 
-                    id: view.id, 
-                    fullname: view.title, 
-                    name: view.name, 
-                    admin: view.admin 
-                };
+            // view.admin should be equal to $scope.admin?
+            $scope.adminUnitSelected = { 
+                id: view.id, 
+                fullname: view.title, 
+                name: view.name, 
+                admin: view.admin 
+            };
                     
             
-            var nextAdmin = adminUnitService.decreaseAdminUnit($scope.admin);
+            var nextAdmin = adminUnitService.decreaseAdminUnit(adminUnit);
             
             // get bounding box for zooming
-            getFeature($scope.admin, view.id).then(function(feature) {
+            getFeature(adminUnit, view.id).then(function(feature) {
                 var bbox = angular.fromJson(feature.get('bbox'));
                 var xmin = bbox.coordinates[0][0][0];
                 var ymin = bbox.coordinates[0][0][1];
@@ -348,14 +349,16 @@ angular.module('vedutaApp')
                 getViews(nextAdmin);
             });
 
-            // draw admin boundary
-            vedutaService.getBoundary($scope.admin,view.id).
-                then(function(geoJSON){
-                $scope.boundingbox.source.geojson.object = geoJSON;
+            // draw admin boundary only for lkr and gmd
+            if (adminUnit === 'lkr' || adminUnit === 'gmd') {
+                vedutaService.getBoundary(adminUnit, view.id).
+                    then(function(geoJSON){
+                    $scope.boundingbox.source.geojson.object = geoJSON;
                 
-            });
+                });
+            }
 
-            // new admin unit
+            // set admin to new admin unit
             $scope.admin = nextAdmin;
         }
     };
