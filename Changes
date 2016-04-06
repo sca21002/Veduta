@@ -2,6 +2,9 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+ 
+    - Clicking on a point on the map get down to the next deeper 
+      admin unit
     - Show boundaries only for lkr and gmd  
 
 0.06      2016-04-05 14:25:59+02:00 Europe/Berlin
