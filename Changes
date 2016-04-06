@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+0.07      2016-04-06 10:21:33+02:00 Europe/Berlin
+
  
     - Clicking on a point on the map get down to the next deeper 
       admin unit
