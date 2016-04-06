@@ -113,6 +113,18 @@ angular.module('vedutaApp')
 //        });
 //    }
     
+    var featurecoll = {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [ 0, 0 ] 
+          }
+        } 
+      ]
+    };  
 
     angular.extend( $scope, {
       center: center,
@@ -140,18 +152,19 @@ angular.module('vedutaApp')
           type: 'GeoJSON',
           attribution: 'Verwaltungsgrenzen <a rel="license" href="http://creativecommons.org/licenses/by/3.0/de/">(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – <a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;',
           geojson: {
-            object: {
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [ 0, 0 ] 
-                  }
-                } 
-              ]
-            },  
+            object: featurecoll,          
+//                object: {
+//                  type: 'FeatureCollection',
+//                  features: [
+//                    {
+//                      type: 'Feature',
+//                      geometry: {
+//                        type: 'Point',
+//                        coordinates: [ 0, 0 ] 
+//                      }
+//                    } 
+//                  ]
+//                },  
             // projection: 'EPSG:3857'
           }
         },
@@ -371,6 +384,9 @@ angular.module('vedutaApp')
                     $scope.boundingbox.source.geojson.object = geoJSON;
                 
                 });
+            } else {
+                    $scope.boundingbox.source.geojson.object = featurecoll;
+
             }
 
             // set admin to new admin unit
@@ -469,6 +485,7 @@ angular.module('vedutaApp')
     olData.getMap().then(function(map) {           
         map.on('pointermove', function(event) {
             var hit = map.forEachFeatureAtPixel(event.pixel, function(feature) {
+                unselectPreviousFeatures();
                 feature.setStyle(styleSelected(feature));
                 selectedFeatures.push(feature);
                 return true;
