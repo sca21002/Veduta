@@ -10,7 +10,7 @@
     "angular-route": "^1.3.0",
     "angular-sanitize": "^1.3.0",
     "angular-touch": "^1.3.0",
-    "angular-openlayers-directive": "https://github.com/sca21002/angular-openlayers-directive.git#ubr-geo",
+    "angular-openlayers-directive": "https://github.com/sca21002/angular-openlayers-directive.git#veduta",
     "angular-bootstrap": "~0.13.4"
   },
   "devDependencies": {
