@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+0.09      2016-04-26 16:40:16+02:00 Europe/Berlin
+
     - ngeo is used instead of angular-openlayers-directive as 
       javascript library to combine angularjs and openlayers
 
