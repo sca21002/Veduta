@@ -1,40 +1,35 @@
 <div class="row">
   <div class="col-md-7">
-      <div id="selected" class="text-left" ng-show="adminUnitSelected.fullname">Ausgewählt: {{adminUnitSelected.fullname}}</div>  
-    <openlayers  ol-center="center" width="100%" height="400px" custom-layers="true">
-       <ol-layer ol-layer-properties="mapbox"></ol-layer>
-       <ol-layer ol-layer-properties="boundingbox"></ol-layer>
-       <ol-layer ol-layer-properties="viewpoints"></ol-layer>
-       <ol-control name="attribution" ol-control-properties="attrib"></ol-control> 
-    </openlayers>
+      <div id="selected" class="text-left" ng-show="vm.adminUnitSelected.fullname">Ausgewählt: {{vm.adminUnitSelected.fullname}}</div>  
+      <div id="map" ngeo-map="vm.map"></div>
   </div>
   <div class="col-md-5">
     <table class="table table-condensed table-hover">
       <thead> 
         <tr>
           <td colspan="2">
-    <div class="text-right">Zoom: {{center.zoom}} - Ebene: {{admin_long}} - Ansichten: {{totalViews}} Seite: {{currentPage}}/{{numPages}}</div>
+    <div class="text-right">Zoom: {{vm.center.zoom}} - Ebene: {{vm.admin_long}} - Ansichten: {{vm.totalViews}} Seite: {{vm.currentPage}}/{{vm.numPages}}</div>
         </td>    
       </thead>
       <tfoot>
         <tr>
           <td colspan="2" class="text-center">
             <pagination 
-              ng-model="currentPage" 
-              items-per-page ="itemsPerPage"
-              total-items="totalViews"
+              ng-model="vm.currentPage" 
+              items-per-page ="vm.itemsPerPage"
+              total-items="vm.totalViews"
               max-size = 6
-              num-pages="numPages"
+              num-pages="vm.numPages"
               previous-text="&lt;"
               next-text="&gt;"
-              ng-change="pageChanged()"
+              ng-change="vm.pageChanged()"
             ></pagination>
           </td>    
         </tr>    
       </tfoot>    
       <tbody>    
-      <tr ng-repeat="view in views.slice(((currentPage-1)*itemsPerPage), ((currentPage)*itemsPerPage))" ng-mouseenter="hover(view)" ng-mouseleave="unhover(view)" ng-click="zoomIn(view, $event)">
-          <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="open(view, $event)"/></td> 
+      <tr ng-repeat="view in vm.views.slice(((vm.currentPage-1)*vm.itemsPerPage), ((vm.currentPage)*vm.itemsPerPage))" ng-mouseenter="vm.hover(view)" ng-mouseleave="vm.unhover(view)" ng-click="vm.zoomIn(view, $event)">
+          <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="vm.open(view, $event)"/></td> 
           <td class="view-row">
               <div id="title">{{view.title}}</div/>
               <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>

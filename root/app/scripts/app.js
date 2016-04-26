@@ -16,7 +16,7 @@ angular
     'ngRoute',
     'ngSanitize',
     'ngTouch',
-    'openlayers-directive',
+    'ngeo',
     'ui.bootstrap',
   ])
   .config(function ($routeProvider) {
@@ -34,7 +34,7 @@ angular
       .when('/views', {
         templateUrl: 'views/views.html',
         controller: 'ViewsCtrl',
-        controllerAs: 'views'
+        controllerAs: 'vm'
       })
       .otherwise({
         redirectTo: '/views'

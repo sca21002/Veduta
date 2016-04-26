@@ -2,6 +2,9 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - ngeo is used instead of angular-openlayers-directive as 
+      javascript library to combine angularjs and openlayers
+
 0.08      2016-04-06 14:08:50+02:00 Europe/Berlin
 
     - Deselecting boundaries if a high level admin unit is chosen

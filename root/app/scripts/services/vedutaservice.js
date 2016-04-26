@@ -21,6 +21,11 @@ angular.module('vedutaApp')
       },  
       viewpointsSourceURL: function (adminUnit) { 
         return baseURL + 'view/group_by/' + adminUnit;
+      },
+      getViewpoints: function (adminUnit) { 
+        return $http.get(baseURL + 'view/group_by/' + adminUnit).then(function(response){
+            return response.data;
+        });
       }
     };
   });

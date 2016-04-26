@@ -12,11 +12,10 @@
 
 angular.module('vedutaApp')
   .controller('ViewsCtrl', function (
-        $scope, $window, olData, searchParams, thumbnailURL, 
+        $scope, $window, thumbnailURL, 
         digitoolService, adminUnitService, vedutaService) {
 
-    var center;
-    center = searchParams.getCenter();
+    var vm = this;
 
     var fill = new ol.style.Fill({
       color: 'rgba(255,255,255,0.4)'
@@ -61,135 +60,88 @@ angular.module('vedutaApp')
             return Math.floor(Math.random() * (length));
     };
 
-    function getLayer(name) {
-        return olData.getMap().then(function(map) {
-            var layers = map.getLayers();
-            var layer;
-            layers.forEach(function(lyr) {
-                if (lyr.get('name') === name) {
-                    layer = lyr;
-                }
-            });
-            return layer;
-        }, function(reason) {
-            console.error('Error for getMap ' + reason);
-        });
-    }
-   
-    function getFeature(adminUnit, id) {
-        return getLayer('views').then(function(layer) {
-            var source = layer.getSource();
-            var features =  source.getFeatures();
-            var feature;
-            features.forEach(function(ftr) {
-                if (adminUnit === 'place') {
-                    var pids   = angular.fromJson(ftr.get('pid'));
-                    pids.forEach(function(pid) {
-                        if (pid === id) { 
-                            feature = ftr; 
-                        }    
-                    });
-                } else {
-                    if (ftr.get('id') === id) {
-                        feature = ftr;
-                    }
-                }     
-            });
-            return feature;
-        }, function(reason) {
-            console.error('Error for getLayer ' + reason);
-        });
-    }
-    
-//    function getAdminFeatures() {
-//        return getLayer('boundaries').then(function(layer) {
-//            if (angular.isDefined(layer)) {
-//                var source = layer.getSource();
-//                var features =  source.getFeatures();
-//                return features;
-//            } else {
-//                return;
-//            }
-//        });
-//    }
-    
-    var featurecoll = {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'Point',
-            coordinates: [ 0, 0 ] 
-          }
-        } 
-      ]
-    };  
-
-    angular.extend( $scope, {
-      center: center,
-      admin: 'lkr',
-      admin_long: adminUnitService.getAdminUnitName('lkr'),
-      mapbox: {
-        name: 'background',
-        source: {
-            type: 'MapBox',
-            mapId: 'sca21002.l80l365g',
-            accessToken: 'pk.eyJ1Ijoic2NhMjEwMDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA'
-        }
-      },
-      viewpoints: {
-        name: 'views',  
-        source: {
-          type: 'GeoJSON',
-          url:  vedutaService.viewpointsSourceURL('lkr'),
-        },
-        style:  customStyleFunction
-      },
-      boundingbox: {
-        name: 'boundaries',
-        source: {
-          type: 'GeoJSON',
-          attribution: 'Verwaltungsgrenzen <a rel="license" href="http://creativecommons.org/licenses/by/3.0/de/">(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – <a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;',
-          geojson: {
-            object: featurecoll,          
-//                object: {
-//                  type: 'FeatureCollection',
-//                  features: [
-//                    {
-//                      type: 'Feature',
-//                      geometry: {
-//                        type: 'Point',
-//                        coordinates: [ 0, 0 ] 
-//                      }
-//                    } 
-//                  ]
-//                },  
-            // projection: 'EPSG:3857'
-          }
-        },
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: [255,255,255,0]
+    var viewpointsSource = new ol.source.Vector({
+        features: [],
+        attributions: [ 
+            new ol.Attribution({
+                html: 'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>'
             }),
-            stroke: new ol.style.Stroke({
-                color: [224,51,51,0.7],
-                width: 1
-            })
-        }),
-      },
-      attrib: { 
-          collapsible: false
-      },
-      // default values are read to late, therefor no effect
-//      defaults: {
-//          controls: { attribution: false },
-//          interactions: {
-//             mouseWheelZoom: true
-//          }
-//      }
-    });   
+            ol.source.OSM.ATTRIBUTION
+        ]
+    });
 
+    var boundarySource = new ol.source.Vector({
+        features: [],
+        attributions: new ol.Attribution({
+            html: 'Verwaltungsgrenzen <a rel="license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
+                  '(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – ' +
+                  '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;' 
+        })        
+    });
+
+    function getFeature(adminUnit, id) {
+        var features = viewpointsSource.getFeatures();
+        var feature;
+        features.forEach(function(ftr) {
+            if (adminUnit === 'place') {
+                var pids   = angular.fromJson(ftr.get('pid'));
+                pids.forEach(function(pid) {
+                    if (pid === id) { 
+                        feature = ftr; 
+                    }    
+                });
+            } else {
+                if (ftr.get('id') === id) {
+                    feature = ftr;
+                }
+            }     
+        });
+        return feature;
+    }
+    
+    var attribution = new ol.control.Attribution({
+        collapsible: false
+    });
+
+    vm.map = new ol.Map({
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.XYZ({
+                    tileSize: [512, 512],
+                    url: 'http://api.tiles.mapbox.com/v4/sca21002.l80l365g/{z}/{x}/{y}@2x.png' +
+                         '?access_token=pk.eyJ1Ijoic2NhMjEwMDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA'
+                })
+            }),
+            new ol.layer.Vector({
+                name: 'views',
+                source: viewpointsSource, 
+                style:  customStyleFunction
+            }),
+            new ol.layer.Vector({
+                source: boundarySource,
+                style: new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: [255,255,255,0]
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: [224,51,51,0.7],
+                        width: 1
+                    })
+                })
+            })
+        ],
+        controls: ol.control.defaults({attribution: false}).extend([attribution]),
+        view: new ol.View({
+            center: ol.proj.transform([10.581, 49.682], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 8,
+        })
+    });
+    
+
+    vm.center = vm.map.getView().getCenter();
+
+    vm.adminUnit = 'lkr';
+    vm.admin_long = adminUnitService.getAdminUnitName('lkr');
 
     function isInSelection(unit, adminUnitSelected) {
         if (!adminUnitSelected || !unit)  { return false; }
@@ -206,7 +158,7 @@ angular.module('vedutaApp')
 
 
     function getViewfromFeature(feature) {
-        var adminUnit = $scope.admin;        
+        var adminUnit = vm.adminUnit;        
         var view = {
             title: adminUnitService.getFullName(
                 feature.get('name'), 
@@ -229,126 +181,91 @@ angular.module('vedutaApp')
 
 
     function updateList() {
-
-        olData.getMap().then(function(map) {
-            $scope.currentPage = 1;
-            $scope.itemsPerPage = 3;	    
-            var adminUnit = $scope.admin;
-            var adminUnitSelected = $scope.adminUnitSelected;
-	        var view = map.getView();
-            var extent = view.calculateExtent( map.getSize() );	    
-            getLayer('views').then(function(layer) {
-                if (!layer) {return;}
-                var source = layer.getSource();
-	            $scope.views = [];
-                var rest = [];
-                var features =  source.getFeaturesInExtent(extent);
-                features.forEach(function(feature) {
-                    var pids;
-                    if (adminUnit === 'place') {
-	                    var titles = angular.fromJson(feature.get('title'));
-		                pids   = angular.fromJson(feature.get('pid'));
-		                var years  = angular.fromJson(feature.get('year'));
-                        if (isOkTitles(titles, pids, years)) {
-		                    titles.forEach(function(title, i) {
-                                if (isInSelection(feature, adminUnitSelected)) {
-		                            $scope.views.push({
-                                        title: title, 
-                                        icon: thumbnailURL(pids[i]), 
-                                        id: pids[i],
-                                        gmd: feature.get('gmd'),
-                                        lkr: feature.get('lkr'),
-                                        regbez: feature.get('regbez')
-                                    });			 
-                                }  else {
-		                            rest.push({
-                                        title: title, 
-                                        icon: thumbnailURL(pids[i]), 
-                                        id: pids[i],
-                                        gmd: feature.get('gmd'),
-                                        lkr: feature.get('lkr'),
-                                        regbez: feature.get('regbez')
-                                    });			 
-            
-                                }
-                            });    
-                        }				     
-                    } else {	
-                        pids   = angular.fromJson(feature.get('pid'));
-                        var index = getRandomPid(pids.length);
-                        var view = getViewfromFeature(feature); 
-                        view.icon = thumbnailURL(pids[index]);
-                        view.pid = pids[index];
+        var view = vm.map.getView();
+        var extent = view.calculateExtent(vm.map.getSize());
+        var adminUnitSelected = vm.adminUnitSelected;
+        var adminUnit = vm.adminUnit;
+        var views = [];
+        var rest = [];
+        var features =  viewpointsSource.getFeaturesInExtent(extent);
+        features.forEach(function(feature) {
+            var pids;
+            if (adminUnit === 'place') {
+                var titles = angular.fromJson(feature.get('title'));
+                pids   = angular.fromJson(feature.get('pid'));
+                var years  = angular.fromJson(feature.get('year'));
+                if (isOkTitles(titles, pids, years)) {
+                    titles.forEach(function(title, i) {
                         if (isInSelection(feature, adminUnitSelected)) {
-		                    $scope.views.push(view);
-                        } else {
-                            rest.push(view);
+                            views.push({
+                                title: title, 
+                                icon: thumbnailURL(pids[i]), 
+                                id: pids[i],
+                                gmd: feature.get('gmd'),
+                                lkr: feature.get('lkr'),
+                                regbez: feature.get('regbez')
+                            });			 
+                        }  else {
+                            rest.push({
+                                title: title, 
+                                icon: thumbnailURL(pids[i]), 
+                                id: pids[i],
+                                gmd: feature.get('gmd'),
+                                lkr: feature.get('lkr'),
+                                regbez: feature.get('regbez')
+                            });			 
                         }
-		            }     
-                });
-                $scope.views = $scope.views.concat(rest);
-                $scope.totalViews = $scope.views.length;
-	        });	
-	    });        	
+                    });    
+                }				     
+            } else {	
+                pids   = angular.fromJson(feature.get('pid'));
+                var index = getRandomPid(pids.length);
+                var view = getViewfromFeature(feature); 
+                view.icon = thumbnailURL(pids[index]);
+                view.pid = pids[index];
+                if (isInSelection(feature, adminUnitSelected)) {
+                    views.push(view);
+                } else {
+                    rest.push(view);
+                }
+            }     
+        });
+        views = views.concat(rest);
+        vm.views = views;
+        vm.totalViews = views.length;
+        vm.currentPage = 1;
+        vm.itemsPerPage = 3;
     }
 
 
     function getViews(adminUnit) {
-        $scope.admin_long = adminUnitService.getAdminUnitName(adminUnit);
-        $scope.viewpoints.source.url = vedutaService.viewpointsSourceURL(adminUnit);
+        vm.admin_long = adminUnitService.getAdminUnitName(adminUnit);
+        vedutaService.getViewpoints(adminUnit).then(function(geoJSON){
+            var geojsonFormat = new ol.format.GeoJSON();
+            var features = geojsonFormat.readFeatures(geoJSON);
+            viewpointsSource.clear();        
+            viewpointsSource.addFeatures(features);
+            updateList();
+        });
     }	    
 
-    $scope.$on('openlayers.geojson.ready', function() {
-	    updateList();
-    });
 
-    $scope.$watch('center.bounds', function() {
-        searchParams.setCenter(center);
-        $scope.currentPage = 1;
-        updateList();
-    });
-
-
-    $scope.$watch('center.zoom', function() {
-        var zoom = $scope.center.zoom;
-        if ($scope.zoomByClick) {
-            $scope.zoomByClick = false;
-        } else {
-            var adminUnit = $scope.admin;
-            if (zoom >= 13) {
-                $scope.admin = 'place';
-            } else if (zoom >= 10) {
-                $scope.admin = 'gmd';
-            } else if (zoom >= 8) { 
-                $scope.admin = 'lkr';
-            } else if (zoom >= 6) { 
-                $scope.admin = 'regbez';
-            } else {
-               $scope.admin = 'bundlan';
-            }
-            if (adminUnit !== $scope.admin) {
-    	        getViews($scope.admin);
-            }    
-        }
-    });
-
-
-    $scope.open = function(view, $event) {
+    vm.open = function(view, $event) {
         $event.stopPropagation();
-        var pid = ($scope.admin === 'place') ? view.id : view.pid;
+        var pid = (vm.adminUnit === 'place') ? view.id : view.pid;
         $window.open(digitoolService.getURL(pid));
     };
 
 
     // TODO: change function name 
-    $scope.zoomIn = function(view, $event) {
-        var adminUnit = $scope.admin;
+    vm.zoomIn = function(view, $event) {
+        var adminUnit = vm.adminUnit;
         if (adminUnit === 'place') {
-            $scope.open(view, $event);
+            vm.open(view, $event);
         } else {
 
             // view.admin should be equal to $scope.admin?
-            $scope.adminUnitSelected = { 
+            vm.adminUnitSelected = { 
                 id: view.id, 
                 fullname: view.title, 
                 name: view.name, 
@@ -357,40 +274,37 @@ angular.module('vedutaApp')
                     
             
             var nextAdmin = adminUnitService.decreaseAdminUnit(adminUnit);
-            
+           
             // get bounding box for zooming
-            getFeature(adminUnit, view.id).then(function(feature) {
-                var bbox = angular.fromJson(feature.get('bbox'));
-                var xmin = bbox.coordinates[0][0][0];
-                var ymin = bbox.coordinates[0][0][1];
-                var xmax = bbox.coordinates[0][2][0];
-                var ymax = bbox.coordinates[0][2][1];
+            var feature = getFeature(adminUnit, view.id);
+            var bbox = angular.fromJson(feature.get('bbox'));
+            var xmin = bbox.coordinates[0][0][0];
+            var ymin = bbox.coordinates[0][0][1];
+            var xmax = bbox.coordinates[0][2][0];
+            var ymax = bbox.coordinates[0][2][1];
                 
-                olData.getMap().then(function(map) {
-                    map.getView().fit(
-                        [xmin,ymin,xmax,ymax], map.getSize(), { nearest: true }
-                    );
-                    $scope.zoomByClick = true;
-                });
-
-                // draw next lower admin unit
-                getViews(nextAdmin);
-            });
+           
+            vm.map.getView().fit(
+                [xmin,ymin,xmax,ymax], vm.map.getSize(), { nearest: true }
+            );
+            // draw next lower admin unit
+            getViews(nextAdmin);
 
             // draw admin boundary only for lkr and gmd
             if (adminUnit === 'lkr' || adminUnit === 'gmd') {
                 vedutaService.getBoundary(adminUnit, view.id).
-                    then(function(geoJSON){
-                    $scope.boundingbox.source.geojson.object = geoJSON;
-                
+                then(function(geoJSON){
+                    var geojsonFormat = new ol.format.GeoJSON();
+                    var features = geojsonFormat.readFeatures(geoJSON);
+                    boundarySource.clear();        
+                    boundarySource.addFeatures(features);
                 });
             } else {
-                    $scope.boundingbox.source.geojson.object = featurecoll;
-
+                boundarySource.clear();        
             }
 
             // set admin to new admin unit
-            $scope.admin = nextAdmin;
+            vm.adminUnit = nextAdmin;
         }
     };
 
@@ -435,64 +349,74 @@ angular.module('vedutaApp')
         });
     }
     
+    vm.map.getView().on('change:resolution', function() {
+        var adminUnit;
+        var zoom = vm.map.getView().getZoom(); 
+        if (zoom >= 13) {
+            adminUnit = 'place';
+        } else if (zoom >= 10) {
+            adminUnit = 'gmd';
+        } else if (zoom >= 8) { 
+            adminUnit = 'lkr';
+        } else if (zoom >= 6) { 
+            adminUnit = 'regbez';
+        } else {
+            adminUnit = 'bundlan';
+        }
+        if (adminUnit !== vm.adminUnit) {
+            vm.adminUnit = adminUnit;
+            getViews(vm.adminUnit);
+        } else {
+//            $scope.$apply();
+        }
+    });
     
-    
-    $scope.hover = function(view) {
+
+    vm.hover = function(view) {
         var view_id = view.id;
-        getFeature($scope.admin, view_id).then(function(feature) {
-            feature.setStyle(styleSelected(feature));
-            selectedFeatures.push(feature);
-        });
+        var feature = getFeature(vm.adminUnit, view_id);
+        feature.setStyle(styleSelected(feature));
+        selectedFeatures.push(feature);
     };
 
 
-    $scope.unhover = function() {
+    vm.unhover = function() {
         unselectPreviousFeatures();
     };
 
+    vm.map.on('moveend', function() {
+       updateList(); 
+       $scope.$apply();
+    });
 
-    olData.getMap().then(function(map) {
-        map.on("click", function(event) {
-            map.forEachFeatureAtPixel(event.pixel, function (feature) {
-                if ($scope.admin === 'place') {
-                    var pids =  angular.fromJson(feature.get('pid'));
-                    if (pids.length === 1) { 
-                        $window.open(digitoolService.getURL(pids[0]));
-                    }
-                } else {
-                    var view =  getViewfromFeature(feature);
-                    $scope.zoomIn(view);
+    vm.map.on('pointermove', function(event) {
+        var hit = vm.map.forEachFeatureAtPixel(event.pixel, function(feature) {
+            unselectPreviousFeatures();
+            feature.setStyle(styleSelected(feature));
+            selectedFeatures.push(feature);
+            return true;
+        }, null, function(layer) {
+            return layer.get('name') === 'views';
+        });
+        if (!hit) { unselectPreviousFeatures(); }
+    }); 
+
+    vm.map.on("click", function(event) {
+        vm.map.forEachFeatureAtPixel(event.pixel, function (feature) {
+            if (vm.adminUnit === 'place') {
+                var pids =  angular.fromJson(feature.get('pid'));
+                if (pids.length === 1) { 
+                    $window.open(digitoolService.getURL(pids[0]));
                 }
-            }, null, function(layer) {
-                return layer.get('name') === 'views';
-            });
+            } else {
+                var view =  getViewfromFeature(feature);
+                vm.zoomIn(view);
+            }
+        }, null, function(layer) {
+            return layer.get('name') === 'views';
         });
     });
 
+    getViews('lkr');
 
-//    function setCoordinateAndShow(coordinate, title, url, pid) {
-//        // Set position
-//        overlay.setPosition(coordinate);
-//        // Update overlay label
-//        // $('#coordinate').text(ol.coordinate.toStringXY(ol.proj.transform(coordinate, 'EPSG:3857', 'EPSG:4326'), 2));
-//        $('#title').text(title);
-//        $('#img').attr("src",url);
-//        $('#title').attr("href", 'http://digital.bib-bvb.de/webclient/DeliveryManager?custom_att_2=simple_viewer&custom_att_1=test&pid=' + pid);
-//        // Show overlay
-//        $(overlay.getElement()).show(); 
-//    }
-
-    olData.getMap().then(function(map) {           
-        map.on('pointermove', function(event) {
-            var hit = map.forEachFeatureAtPixel(event.pixel, function(feature) {
-                unselectPreviousFeatures();
-                feature.setStyle(styleSelected(feature));
-                selectedFeatures.push(feature);
-                return true;
-            }, null, function(layer) {
-                return layer.get('name') === 'views';
-            });
-            if (!hit) { unselectPreviousFeatures(); }
-        });  
-    });
 });
