@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - closure compiler is used to optimize the javascript soure code
+
 0.09      2016-04-26 16:40:16+02:00 Europe/Berlin
 
     - ngeo is used instead of angular-openlayers-directive as 
