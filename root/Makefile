@@ -21,6 +21,9 @@ help:
 	@echo "Main targets:"
 	@echo
 	@echo "- help                    Display this help message"
+	@echo "- build-veduta-app        Build a compiled version of the app in one file"
+	@echo "- clean                   Remove generated files"
+	@echo "- cleanall                Remove all the build artefacts"
 	@echo "- serve                   Run a development web server for running the examples"
 	@echo
 
@@ -55,6 +58,7 @@ serve: .build/node_modules.timestamp
 		--var source_map=build/$*.js.map $< > $@
 
 build/%.js: .build/%.js $(VEDUTA_APPS_LIBS_JS_FILES)
+	mkdir -p $(dir $@)
 	awk 'FNR==1{print ""}1' $(VEDUTA_APPS_LIBS_JS_FILES) $< > $@
 
 .build/python-venv:
@@ -84,3 +88,16 @@ $(EXTERNS_JQUERY):
 .build/python-venv/bin/mako-render: .build/python-venv
 	.build/python-venv/bin/pip install "Mako==1.0.0" "htmlmin==0.1.10"
 	touch $@
+
+.PHONY: clean
+clean:
+	rm -f .build/*.check.timestamp
+	rm -f .build/eslint.timestamp
+	rm -f .build/veduta.json
+	rm -f .build/app-veduta.json
+	rm -f $(EXTERNS_FILES)
+
+.PHONY: cleanall
+cleanall: clean
+	rm -rf .build
+	rm -rf node_modules
