@@ -1,3 +1,5 @@
+FONTAWESOME_WEBFONT = $(addprefix fonts/fontawesome-webfont., eot ttf woff woff2)
+
 VEDUTA_SRC_JS_FILES := $(shell find src -type f -name '*.js')
 VEDUTA_APPS_JS_FILES := $(shell find apps/ -type f -name '*.js')
 VEDUTA_APPS_LIBS_JS_FILES += \
@@ -31,7 +33,7 @@ help:
 build-veduta-app: build/veduta.js
 
 .PHONY: serve
-serve: .build/node_modules.timestamp 
+serve: .build/node_modules.timestamp $(FONTAWESOME_WEBFONT)
 	node buildtools/serve.js
 
 .build/node_modules.timestamp: package.json
@@ -56,6 +58,14 @@ serve: .build/node_modules.timestamp
 		--var entry_point=app_$* \
 		--var generate_exports=true \
 		--var source_map=build/$*.js.map $< > $@
+
+.PRECIOUS: node_modules/font-awesome/fonts/fontawesome-webfont.%
+node_modules/font-awesome/fonts/fontawesome-webfont.%: .build/node_modules.timestamp
+	touch -c $@
+
+fonts/fontawesome-webfont.%: node_modules/font-awesome/fonts/fontawesome-webfont.%
+	mkdir -p $(dir $@)
+	cp $< $@
 
 build/%.js: .build/%.js $(VEDUTA_APPS_LIBS_JS_FILES)
 	mkdir -p $(dir $@)
@@ -96,6 +106,8 @@ clean:
 	rm -f .build/veduta.json
 	rm -f .build/app-veduta.json
 	rm -f $(EXTERNS_FILES)
+	rm -f fonts/FontAwesome.otf
+	rm -f fonts/fontawesome-webfont.*
 
 .PHONY: cleanall
 cleanall: clean

@@ -12,6 +12,7 @@
     "angular": "^1.5.5",
     "angular-gettext": "^2.2.1",
     "bootstrap": "^3.3.6",
+    "font-awesome": "^4.6.1",
     "ngeo": "*",
     "openlayers": "^3.15.1"
   },

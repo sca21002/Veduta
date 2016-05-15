@@ -1,7 +1,6 @@
 goog.provide('app_veduta');
 goog.provide('app.MainController');
 
-
 goog.require('veduta');
 
 /** @suppress {extraRequire} */
@@ -35,6 +34,7 @@ goog.require('ol.style.Fill');
 goog.require('ol.style.Circle');
 goog.require('ol.style.Stroke');
 goog.require('ol.Attribution');
+goog.require('ol.geom.Point');
 
 
 /** @type {!angular.Module} **/
@@ -90,9 +90,11 @@ app.MainController = function(
             image: new ol.style.Circle({
                 fill: fill,
                 stroke: stroke,
-                radius: 10
-            })
-
+                radius: 10,
+                snapToPixel: false
+            }),
+            fill: fill,
+            stroke: stroke
         })];
     };
 
@@ -170,9 +172,9 @@ app.MainController = function(
     this.admin_long = vedutaAdminUnit.getAdminUnitName(this.adminUnit);
 
     function isOkTitles(titles, pids, years) {
-        return angular.isArray(titles) && 
-               angular.isArray(pids) && 
-               angular.isArray(years) &&
+        return goog.isArray(titles) && 
+               goog.isArray(pids) && 
+               goog.isArray(years) &&
                titles.length === pids.length && 
                titles.length === years.length; 
     }
@@ -294,15 +296,104 @@ app.MainController = function(
         vm.itemsPerPage = 3;
     }
 
-    this.getViews = function(adminUnit) {
+
+    this.moveFeatureDown = function(event) {
+      if (angular.isDefined(vm.features)) { 
+        var vectorContext = event.vectorContext;
+        var frameState = event.frameState;
+        //console.log('In moveFeatureDown: ',frameState.time - vm.now);
+        var elapsedTime = frameState.time - vm.now;
+        var fraction = elapsedTime / 1000;
+        if (fraction <= 1) {
+          vm.features.forEach(function(feature) {
+            var currentPoint = new ol.geom.Point(feature.getGeometry().getCoordinateAt(fraction));
+            var ftr = feature.clone();
+            ftr.setGeometry(currentPoint);
+            vectorContext.drawFeature(ftr, customStyleFunction(ftr)[0]);
+          });
+          vm.map.render();
+        } else {
+          vm.map.un('postcompose', vm.moveFeatureDown);  
+          var pointFeatures = []; 
+          vm.features.forEach(function(feature) {
+                var geom = /** @type {ol.geom.LineString} */ (feature.getGeometry());
+                var coord = geom.getLastCoordinate();
+                var pointFeature = feature.clone();
+                pointFeature.setGeometry(new ol.geom.Point(coord));
+                pointFeatures.push(pointFeature);
+          });
+          vm.viewpointsSource.addFeatures(pointFeatures);
+          updateList();
+          $scope.$apply();
+        }
+      }  
+    }
+
+
+    this.startAnimationDown = function() {
+        console.log('start animation');
+        this.now = new Date().getTime();
+        this.map.on('postcompose', this.moveFeatureDown);
+    }
+
+    this.getViewsDown = function(adminUnit) {
         vm.admin_long = vedutaAdminUnit.getAdminUnitName(adminUnit);
         vedutaLocations.getLocations(adminUnit).then(function(geoJSON) {
             var geojsonFormat = new ol.format.GeoJSON();
-            var features = geojsonFormat.readFeatures(geoJSON);
+            vm.features = geojsonFormat.readFeatures(geoJSON);
             vm.viewpointsSource.clear();
-            vm.viewpointsSource.addFeatures(features);
-            updateList();
+            vm.startAnimationDown();    
         });
+    };
+
+
+    this.moveFeatureUp = function(event) {
+      if (angular.isDefined(vm.features)) { 
+        var vectorContext = event.vectorContext;
+        var frameState = event.frameState;
+        //console.log('In moveFeatureUp: ',frameState.time - vm.now);
+        var elapsedTime = frameState.time - vm.now;
+        var fraction = 1 - elapsedTime / 1000;
+        if (fraction >= 0) {
+          vm.features.forEach(function(feature) {
+            var currentPoint = new ol.geom.Point(feature.getGeometry().getCoordinateAt(fraction));
+            var ftr = feature.clone();
+            ftr.setGeometry(currentPoint);
+            vectorContext.drawFeature(ftr, customStyleFunction(ftr)[0]);
+          });
+          vm.map.render();
+        } else {
+            vm.map.un('postcompose', vm.moveFeatureUp);  
+            vedutaLocations.getLocations(vm.adminUnit).then(function(geoJSON) {
+                var geojsonFormat = new ol.format.GeoJSON();
+                vm.features = geojsonFormat.readFeatures(geoJSON);
+                var pointFeatures = []; 
+                vm.features.forEach(function(feature) {
+                    var geom = /** @type {ol.geom.LineString} */ (feature.getGeometry());
+                    var coord = geom.getLastCoordinate();
+                    var pointFeature = feature.clone();
+                    pointFeature.setGeometry(new ol.geom.Point(coord));
+                    pointFeatures.push(pointFeature);
+                });
+                vm.viewpointsSource.addFeatures(pointFeatures);
+                updateList();
+                //$scope.$apply();
+            });
+        }
+      }  
+    }
+
+
+    this.startAnimationUp = function() {
+        console.log('start animation');
+        this.now = new Date().getTime();
+        this.map.on('postcompose', this.moveFeatureUp);
+    }
+
+    this.getViewsUp = function(adminUnit) {
+        vm.admin_long = vedutaAdminUnit.getAdminUnitName(adminUnit);
+        vm.viewpointsSource.clear();
+        vm.startAnimationUp();    
     };
 
 
@@ -346,12 +437,12 @@ app.MainController = function(
         });
     };
 
-
     ol.events.listen(this.map.getView(),
         ol.Object.getChangeEventType(ol.ViewProperty.RESOLUTION),
         function() {
             console.log('in change:resolution');
             var adminUnit;
+            var zoomOld = vm.zoom;
             vm.zoom = vm.map.getView().getZoom(); 
             if (vm.zoom >= 13) {
                 adminUnit = 'place';
@@ -366,7 +457,11 @@ app.MainController = function(
             }
             if (adminUnit !== vm.adminUnit) {
                 vm.adminUnit = adminUnit;
-                this.getViews(vm.adminUnit);
+                if (zoomOld > vm.zoom) {
+                    this.getViewsUp(vm.adminUnit);
+                } else {
+                    this.getViewsDown(vm.adminUnit);
+                }
             } else {
             }
         }, this
@@ -375,7 +470,6 @@ app.MainController = function(
 
     ol.events.listen(this.map, ol.MapBrowserEvent.EventType.POINTERMOVE,
         function(event) {
-        console.log('pointermove');
         var hit = vm.map.forEachFeatureAtPixel(event.pixel, function(feature) {
             vm.unselectPreviousFeatures();
             feature.setStyle(vm.styleSelected(feature));
@@ -417,7 +511,7 @@ app.MainController = function(
         }, this
     );
 
-    this.getViews(this.adminUnit);
+    this.getViewsDown(this.adminUnit);
 };
 
 
@@ -487,7 +581,7 @@ app.MainController.prototype.zoomIn = function(view, event) {
             [xmin,ymin,xmax,ymax], mapSize, /** @type {olx.view.FitOptions} */ ({nearest: true})
         );
         // draw next lower admin unit
-        this.getViews(nextAdmin);
+        this.getViewsDown(nextAdmin);
 
         // draw admin boundary only for lkr and gmd
         if (adminUnit === 'lkr' || adminUnit === 'gmd') {

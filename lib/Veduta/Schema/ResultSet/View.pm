@@ -43,9 +43,16 @@ sub as_centroid_of_admin {
         gmd    => 'bez_gem',
         lkr    => 'bez_krs',
         regbez => 'bez_rbz',
-	bundlan   => 'bez_lan',
+	    bundlan   => 'bez_lan',
     );
 
+    my %admin_higher = (
+        gmd    => 'lkr',
+        lkr    => 'regbez',
+        regbez => 'bundlan', 
+    );
+    
+    my $admin_higher = $admin_higher{$admin};
 
     $attrs = {} unless ref $attrs eq 'HASH';
 
@@ -55,7 +62,7 @@ sub as_centroid_of_admin {
 	        \'json_agg(title)',
 	        \'json_agg(pid)',
 	        \'json_agg(year)',
-            \'ST_AsGeoJSON(me.geom)',
+            \"ST_AsGeoJSON(ST_MakeLine(gmd.centroid, me.geom))", 
             { count => 'me.geom' },
             'gmd.bez_gem', 'gmd.bez_krs', 'gmd.bez_rbz',
 
@@ -63,12 +70,12 @@ sub as_centroid_of_admin {
         $attrs->{'as'} = [ 'title', 'pid', 'year', 'geom' , 'view_count',
             'gmd', 'lkr', 'regbez',
         ];
-        $attrs->{group_by} = [ 'me.geom', 'gmd.bez_gem', 'gmd.bez_krs', 'gmd.bez_rbz' ];
+        $attrs->{group_by} = [ 'me.geom', 'gmd.centroid', 'gmd.bez_gem', 'gmd.bez_krs', 'gmd.bez_rbz' ];
         $attrs->{join} = 'gmd';
-    } else {
+    } elsif ($admin eq 'bundlan') {
         $attrs->{'select'} = [ 
             "${admin}_id",
-            \"ST_AsGeoJSON(centroid)", 
+            \"ST_AsGeoJSON($admin.centroid)", 
             "$admin." . $bez{$admin},
             "$admin.adm",
             { count => "${admin}_id" },
@@ -80,6 +87,21 @@ sub as_centroid_of_admin {
         ];
         $attrs->{join} = $admin;
         $attrs->{group_by} = ["${admin}_id",  "$admin.centroid", "$admin." . $bez{$admin}, "$admin.adm", "$admin.bbox"];
+    } else {
+        $attrs->{'select'} = [ 
+            "${admin}_id",
+            \"ST_AsGeoJSON(ST_MakeLine($admin_higher.centroid, $admin.centroid))", 
+            "$admin." . $bez{$admin},
+            "$admin.adm",
+            { count => "${admin}_id" },
+            \'json_agg(pid)',
+            \"ST_AsGeoJSON($admin.bbox)",
+        ];
+        $attrs->{'as'} = [
+            'id', 'geom', 'name' , 'adm', 'view_count', 'pid', 'bbox',
+        ];
+        $attrs->{join} = [ $admin, $admin_higher ];
+        $attrs->{group_by} = ["${admin}_id",  "$admin.centroid", "$admin." . $bez{$admin}, "$admin.adm", "$admin.bbox", "$admin_higher.centroid"];
     }    
     if ($admin eq 'lkr' || $admin eq 'gmd' 
         # || $admin eq 'place') 

@@ -3,4 +3,6 @@
 .build
 *.log
 *.swp
+*.swo
 /data
+/root/fonts
