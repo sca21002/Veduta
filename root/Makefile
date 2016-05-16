@@ -1,7 +1,7 @@
 FONTAWESOME_WEBFONT = $(addprefix fonts/fontawesome-webfont., eot ttf woff woff2)
 
 VEDUTA_SRC_JS_FILES := $(shell find src -type f -name '*.js')
-VEDUTA_APPS_JS_FILES := $(shell find apps/ -type f -name '*.js')
+VEDUTA_APPS_JS_FILES := $(shell find app/ -type f -name '*.js')
 VEDUTA_APPS_LIBS_JS_FILES += \
 	node_modules/angular/angular.min.js \
 	node_modules/angular-gettext/dist/angular-gettext.min.js \
@@ -53,7 +53,7 @@ serve: .build/node_modules.timestamp $(FONTAWESOME_WEBFONT)
 .build/app-%.json: buildtools/mako_build.json .build/python-venv/bin/mako-render
 	mkdir -p $(dir $@)
 	PYTHONIOENCODING=UTF-8 .build/python-venv/bin/mako-render \
-		--var 'src=apps/**/*.js' \
+		--var 'src=app/**/*.js' \
 		--var src_set=contribs_veduta \
 		--var entry_point=app_$* \
 		--var generate_exports=true \

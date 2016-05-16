@@ -1,6 +1,6 @@
 <%doc>
 lib:            Set to true to create the libraries files (ngeo or gmf)
-src:            An additional source directory, used by apps
+src:            An additional source directory, used by app
 src_set:        The used source set (ngeo|contribs_gmf|contribs_veduta)
 examples:       Add the examples files
 entry_point:    The entry point

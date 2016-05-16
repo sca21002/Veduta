@@ -53,7 +53,7 @@ var manager = new closure.Manager({
     'node_modules/openlayers/src/**/*.js',
     'node_modules/openlayers/build/ol.ext/*.js'
   ],
-  main: ['apps/**/*.js']
+  main: ['app/**/*.js']
 });
 manager.on('error', function(e) {
   log.error('veduta', e.message);
