@@ -17,6 +17,9 @@
     "openlayers": "^3.15.1"
   },
   "devDependencies": {
-    "closure-util": "^1.13.0"
+    "closure-util": "^1.13.0",
+    "less": "^2.7.1",
+    "less-plugin-autoprefix": "^1.5.1",
+    "less-plugin-clean-css": "^1.5.1"
   }
 }

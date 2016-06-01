@@ -41,6 +41,16 @@ goog.require('ol.geom.Point');
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
 app.module.constant('vedutaServerURL', 'http://localhost:8888/');
+app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
+  '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
+  '(CC BY 3.0 DE)</a>Datenquelle: Bayerische Vermessungsverwaltung – ' + 
+  '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;'); 
+app.module.constant('mapboxURL', 'http://api.tiles.mapbox.com/v4/' +
+  'sca21002.l80l365g/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1Ijoic2NhMjEw' +
+  'MDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA');
+app.module.constant('mapboxAttributionHTML', 
+  'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>');
+
 
 /**
  * @param {veduta.Locations} vedutaLocations service for locations of vedute

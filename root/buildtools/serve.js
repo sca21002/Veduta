@@ -29,7 +29,7 @@ var options = nomnom.options({
 log.level = options.loglevel;
 
 function compileCss() {
-  log.info('ngeo', 'Compiling CSS');
+  log.info('veduta', 'Compiling CSS');
   exec('make compile-css', function(error, stdout, stderr) {
     if (error !== null) {
       console.log(error);
@@ -41,7 +41,7 @@ function compileCss() {
 
 }
 
-// compileCss();  
+compileCss();  
 
 log.info('veduta', 'Parsing dependencies ...');
 var manager = new closure.Manager({
