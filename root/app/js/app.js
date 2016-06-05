@@ -77,45 +77,58 @@ app.MainController = function(
     this.vedutaDigitool = vedutaDigitool;
     this.window = $window;
 
-    var fill = new ol.style.Fill({
-        color: 'rgba(255,255,255,0.4)'
+    var circleFill = new ol.style.Fill({
+        color: 'rgba(150,28,49,0.4)'
     });
-    var stroke = new ol.style.Stroke({
-        color: '#fe3333',
+    var circleStroke = new ol.style.Stroke({
+        color: 'rgba(128,28,49,0)',
         width: 1.25
     });
+    var circleRadius = 7;
 
-    var customStyleFunction = function(feature) {
+    var viewpointStyleFn = function(feature) {
         return [new ol.style.Style({
+            image: new ol.style.Circle({
+                fill: circleFill,
+                stroke: circleStroke,
+                radius: circleRadius,
+                snapToPixel: false
+            }),
+            fill: circleFill,
+            stroke: circleStroke
+        })];
+    };
+
+    this.viewpointStyleSelectedFn = function(feature) {
+        return  new ol.style.Style({
             text: new ol.style.Text({
                 text: feature.get('view_count').toString(),
                 fill: new ol.style.Fill({
                     color: '#000'
                 }),
-                stroke: new ol.style.Stroke({
-                    color: '#fff',
-                    width: 1
-                })
+            }),    
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 100, 50, 0.3)'
+            }),
+            stroke: new ol.style.Stroke({
+                width: 2,
+                color: 'rgba(255, 100, 50, 0.8)'
             }),
             image: new ol.style.Circle({
-                fill: fill,
-                stroke: stroke,
-                radius: 10,
-                snapToPixel: false
-            }),
-            fill: fill,
-            stroke: stroke
-        })];
+                fill: new ol.style.Fill({
+                    color: 'rgba(255,255,255,0.4)'
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 3,
+                    color: 'rgba(128,28,49,1)'
+                }),
+                radius: 10
+            })
+        });
     };
 
     this.viewpointsSource = new ol.source.Vector({
-        features: [],
-        attributions: [
-            new ol.Attribution({
-                html: 'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>'
-            }),
-            ol.source.OSM.ATTRIBUTION
-        ]
+        features: []
     });
 
     this.boundarySource = new ol.source.Vector({
@@ -140,12 +153,18 @@ app.MainController = function(
                     url: 'http://api.tiles.mapbox.com/v4/sca21002.l80l365g/' +
                         '{z}/{x}/{y}@2x.png?access_token=pk.eyJ1Ijoic2NhMjEw' +
                         'MDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA'
-                })
+                }),
+                attributions: [
+                    new ol.Attribution({
+                        html: 'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>'
+                    }),
+                    ol.source.OSM.ATTRIBUTION
+                ]
             }),
             new ol.layer.Vector({
                 name: 'views',
                 source: this.viewpointsSource,
-                style:  customStyleFunction
+                style:  viewpointStyleFn
             }),
             new ol.layer.Vector({
                 source: this.boundarySource,
@@ -319,7 +338,7 @@ app.MainController = function(
             var currentPoint = new ol.geom.Point(feature.getGeometry().getCoordinateAt(fraction));
             var ftr = feature.clone();
             ftr.setGeometry(currentPoint);
-            vectorContext.drawFeature(ftr, customStyleFunction(ftr)[0]);
+            vectorContext.drawFeature(ftr, viewpointStyleFn(ftr)[0]);
           });
           vm.map.render();
         } else {
@@ -369,7 +388,7 @@ app.MainController = function(
             var currentPoint = new ol.geom.Point(feature.getGeometry().getCoordinateAt(fraction));
             var ftr = feature.clone();
             ftr.setGeometry(currentPoint);
-            vectorContext.drawFeature(ftr, customStyleFunction(ftr)[0]);
+            vectorContext.drawFeature(ftr, viewpointStyleFn(ftr)[0]);
           });
           vm.map.render();
         } else {
@@ -419,34 +438,6 @@ app.MainController = function(
     };
 
 
-    this.styleSelected = function(feature) {
-        return  new ol.style.Style({
-            text: new ol.style.Text({
-                text: feature.get('view_count').toString(),
-                fill: new ol.style.Fill({
-                    color: '#000'
-                }),
-            }),    
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 100, 50, 0.3)'
-            }),
-            stroke: new ol.style.Stroke({
-                width: 2,
-                color: 'rgba(255, 100, 50, 0.8)'
-            }),
-            image: new ol.style.Circle({
-                fill: new ol.style.Fill({
-                    color: 'rgba(255,255,255,0.4)'
-                }),
-                stroke: new ol.style.Stroke({
-                    width: 5,
-                    color: '#fe3333'
-                }),
-                radius: 14
-            })
-        });
-    };
-
     ol.events.listen(this.map.getView(),
         ol.Object.getChangeEventType(ol.ViewProperty.RESOLUTION),
         function() {
@@ -482,7 +473,7 @@ app.MainController = function(
         function(event) {
         var hit = vm.map.forEachFeatureAtPixel(event.pixel, function(feature) {
             vm.unselectPreviousFeatures();
-            feature.setStyle(vm.styleSelected(feature));
+            feature.setStyle(vm.viewpointStyleSelectedFn(feature));
             vm.selectedFeatures.push(feature);
             return true;
         }, null, function(layer) {
@@ -622,7 +613,7 @@ app.MainController.prototype.zoomIn = function(view, event) {
 app.MainController.prototype.hover = function(view) {
     var view_id = view.id;
     var feature = this.getFeature_(this.adminUnit, view_id);
-    feature.setStyle(this.styleSelected(feature));
+    feature.setStyle(this.viewpointStyleSelectedFn(feature));
     this.selectedFeatures.push(feature);
 };
 
