@@ -34,6 +34,7 @@ goog.require('ol.style.Fill');
 goog.require('ol.style.Circle');
 goog.require('ol.style.Stroke');
 goog.require('ol.Attribution');
+goog.require('ol.control.Attribution');
 goog.require('ol.geom.Point');
 
 
@@ -45,9 +46,9 @@ app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
   '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
   '(CC BY 3.0 DE)</a>Datenquelle: Bayerische Vermessungsverwaltung – ' + 
   '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;'); 
-app.module.constant('mapboxURL', 'http://api.tiles.mapbox.com/v4/' +
-  'sca21002.l80l365g/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1Ijoic2NhMjEw' +
-  'MDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA');
+app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/mapbox/' +
+  'light-v9/tiles/{z}/{x}/{y}?access_token=' +
+  'pk.eyJ1Ijoic2NhMjEwMDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA');
 app.module.constant('mapboxAttributionHTML', 
   'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>');
 
@@ -61,7 +62,8 @@ app.module.constant('mapboxAttributionHTML',
  */
 app.MainController = function(
     $scope, $window, vedutaBoundary, vedutaDigitool, vedutaLocations, 
-    vedutaAdminUnit, vedutaThumbnail) {
+    vedutaAdminUnit, vedutaThumbnail, mapboxURL, boundaryAttributionHTML, 
+    mapboxAttributionHTML) {
 
     var vm = this;
 
@@ -78,7 +80,8 @@ app.MainController = function(
     this.window = $window;
 
     var circleFill = new ol.style.Fill({
-        color: 'rgba(150,28,49,0.4)'
+      color: 'rgba(150,28,49,0.4)'
+//      color: 'rgba(252,130,151,1)'
     });
     var circleStroke = new ol.style.Stroke({
         color: 'rgba(128,28,49,0)',
@@ -90,12 +93,12 @@ app.MainController = function(
         return [new ol.style.Style({
             image: new ol.style.Circle({
                 fill: circleFill,
-                stroke: circleStroke,
+             //   stroke: circleStroke,
                 radius: circleRadius,
                 snapToPixel: false
             }),
-            fill: circleFill,
-            stroke: circleStroke
+//            fill: circleFill,
+//            stroke: circleStroke
         })];
     };
 
@@ -134,10 +137,12 @@ app.MainController = function(
     this.boundarySource = new ol.source.Vector({
         features: [],
         attributions: new ol.Attribution({
-            html: 'Verwaltungsgrenzen <a rel="license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
-                  '(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – ' +
-                  '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;' 
+            html: boundaryAttributionHTML
         })        
+    });
+
+    var customAttribution = new ol.control.Attribution({
+      collapsed: false
     });
 
 
@@ -150,13 +155,11 @@ app.MainController = function(
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
                     tileSize: [512, 512],
-                    url: 'http://api.tiles.mapbox.com/v4/sca21002.l80l365g/' +
-                        '{z}/{x}/{y}@2x.png?access_token=pk.eyJ1Ijoic2NhMjEw' +
-                        'MDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA'
+                      url: mapboxURL
                 }),
                 attributions: [
                     new ol.Attribution({
-                        html: 'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>'
+                        html: mapboxAttributionHTML
                     }),
                     ol.source.OSM.ATTRIBUTION
                 ]
@@ -185,7 +188,10 @@ app.MainController = function(
                 [10.581, 49.682], 'EPSG:4326', 'EPSG:3857'
              ),
             zoom: 8
-        })
+        }),
+        controls:  ol.control.defaults(
+          { attribution: false }
+        ).extend([customAttribution])
     });
 
     
@@ -491,6 +497,15 @@ app.MainController = function(
                         var pids =  angular.fromJson(feature.get('pid'));
                         if (pids.length === 1) { 
                             $window.open(vedutaDigitool.getURL(pids[0]));
+                        } else {
+                          vm.views.sort(function(a,b) {
+                            // a = 0 , b = -1 -> negative
+                            // a = -1, b = 0 -> negative
+                            // a = 0, b = 1 -> negative
+                            // a = 1, b = 0 -> positive
+                            return pids.indexOf(b.id) - pids.indexOf(a.id);
+                          });
+                          $scope.$apply();
                         }
                     } else {
                         console.log('getViewFromFeature');
