@@ -41,7 +41,7 @@ goog.require('ol.geom.Point');
 /** @type {!angular.Module} **/
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
-app.module.constant('vedutaServerURL', 'http://localhost:8888/');
+app.module.constant('vedutaServerURL', 'http://rzbvm038.uni-regensburg.de/veduta-srv/');
 app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
   '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
   '(CC BY 3.0 DE)</a>Datenquelle: Bayerische Vermessungsverwaltung – ' + 
@@ -505,6 +505,7 @@ app.MainController = function(
                             // a = 1, b = 0 -> positive
                             return pids.indexOf(b.id) - pids.indexOf(a.id);
                           });
+                          vm.currentPage = 1;
                           $scope.$apply();
                         }
                     } else {

@@ -2,7 +2,12 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
-    - closure compiler is used to optimize the javascript soure code
+0.0.10    2016-06-10 07:43:11+02:00 Europe/Berlin
+
+    - Sort views list on click on place markers
+    - Change colors of view marker    
+    - Change style sheets to less format
+    - Closure compiler is used to optimize the javascript soure code
 
 0.09      2016-04-26 16:40:16+02:00 Europe/Berlin
 
