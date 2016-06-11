@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+0.0.14    2016-06-11 17:21:17+02:00 Europe/Berlin
+
     - At the lowest level a click on the metadata opens the external viewer
 
 0.0.13    2016-06-11 16:35:03+02:00 Europe/Berlin
