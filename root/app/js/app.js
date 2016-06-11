@@ -505,18 +505,17 @@ app.MainController = function(
                 function (feature) {
                     if (vm.adminUnit === 'place') {
                         var pids =  angular.fromJson(feature.get('pid'));
+                        vm.views.sort(function(a,b) {
+                          // a = 0 , b = -1 -> negative
+                          // a = -1, b = 0 -> negative
+                          // a = 0, b = 1 -> negative
+                          // a = 1, b = 0 -> positive
+                          return pids.indexOf(b.id) - pids.indexOf(a.id);
+                        });
+                        vm.currentPage = 1;
+                        $scope.$apply();
                         if (pids.length === 1) { 
                             vm.openExternalViewer_(pids[0]);
-                        } else {
-                          vm.views.sort(function(a,b) {
-                            // a = 0 , b = -1 -> negative
-                            // a = -1, b = 0 -> negative
-                            // a = 0, b = 1 -> negative
-                            // a = 1, b = 0 -> positive
-                            return pids.indexOf(b.id) - pids.indexOf(a.id);
-                          });
-                          vm.currentPage = 1;
-                          $scope.$apply();
                         }
                     } else {
                         console.log('getViewFromFeature');
