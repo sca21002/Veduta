@@ -62,9 +62,9 @@ app.module.constant('mapboxAttributionHTML',
  * @ngInject
  */
 app.MainController = function(
-    $scope, $window, vedutaBoundary, vedutaDigitool, vedutaLocations, 
-    vedutaAdminUnit, vedutaThumbnail, mapboxURL, boundaryAttributionHTML, 
-    mapboxAttributionHTML) {
+    $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL, 
+    boundaryAttributionHTML, mapboxAttributionHTML) {
 
     var vm = this;
 
@@ -79,6 +79,7 @@ app.MainController = function(
     this.vedutaBoundary = vedutaBoundary;
     this.vedutaDigitool = vedutaDigitool;
     this.window = $window;
+    this.debug = $location.search().debug;
 
     var circleFill = new ol.style.Fill({
       color: 'rgba(150,28,49,0.4)'

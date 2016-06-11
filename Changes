@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Additional informations in the list header are only shown in debug mode 
+
 0.0.12    2016-06-11 13:12:32+02:00 Europe/Berlin
 
     - Set language of the labels on the background map to german

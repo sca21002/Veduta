@@ -21,7 +21,10 @@
                 <thead> 
                   <tr>
                     <td colspan="2">
-                      <div class="text-right">Zoom: {{ctrl.zoom}} - Ebene: {{ctrl.admin_long}} - Ansichten: {{ctrl.totalViews}} Seite: {{ctrl.currentPage}}/{{ctrl.numPages}}</div>
+                      <div class="text-right"> 
+                        <span ng-show="ctrl.debug">Zoom: {{ctrl.zoom}} - Ebene: {{ctrl.admin_long}} - Ansichten: {{ctrl.totalViews}}</span>
+                        <span> Seite: {{ctrl.currentPage}}/{{ctrl.numPages}}</span>
+                      </div>
                   </td>    
                 </thead>
                 <tfoot>
