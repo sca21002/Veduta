@@ -44,7 +44,7 @@ app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 app.module.constant('vedutaServerURL', 'http://rzbvm038.uni-regensburg.de/veduta-srv/');
 app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
   '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
-  '(CC BY 3.0 DE)</a>Datenquelle: Bayerische Vermessungsverwaltung – ' + 
+  '(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – ' + 
   '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;'); 
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
@@ -164,15 +164,15 @@ app.MainController = function(
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
-                    tileSize: [512, 512],
-                      url: mapboxURL
+                  tileSize: [512, 512],
+                  url: mapboxURL,
+                  attributions: [
+                      new ol.Attribution({
+                          html: mapboxAttributionHTML
+                      }),
+                      ol.source.OSM.ATTRIBUTION
+                  ]
                 }),
-                attributions: [
-                    new ol.Attribution({
-                        html: mapboxAttributionHTML
-                    }),
-                    ol.source.OSM.ATTRIBUTION
-                ]
             }),
             new ol.layer.Vector({
                 name: 'views',
