@@ -6,3 +6,5 @@
 *.swo
 /data
 /root/fonts
+/root/node_modules
+/root/build

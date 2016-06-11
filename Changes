@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Different marker at the lowest level (level without clustering) 
+
 0.0.10    2016-06-10 07:43:11+02:00 Europe/Berlin
 
     - Sort views list on click on place markers

@@ -2,6 +2,7 @@ FONTAWESOME_WEBFONT = $(addprefix fonts/fontawesome-webfont., eot ttf woff woff2
 
 VEDUTA_SRC_JS_FILES := $(shell find src -type f -name '*.js')
 VEDUTA_APPS_JS_FILES := $(shell find app/ -type f -name '*.js')
+VEDUTA_APPS_LESS_FILES := $(shell find less -type f -name '*.less')
 VEDUTA_APPS_LIBS_JS_FILES += \
 	node_modules/angular/angular.min.js \
 	node_modules/angular-gettext/dist/angular-gettext.min.js \
@@ -70,6 +71,16 @@ fonts/fontawesome-webfont.%: node_modules/font-awesome/fonts/fontawesome-webfont
 build/%.js: .build/%.js $(VEDUTA_APPS_LIBS_JS_FILES)
 	mkdir -p $(dir $@)
 	awk 'FNR==1{print ""}1' $(VEDUTA_APPS_LIBS_JS_FILES) $< > $@
+
+.PHONY: compile-css
+compile-css: build/veduta.css
+
+build/%.css: less/veduta.less \
+		$(VEDUTA_APPS_LESS_FILES) \
+		.build/node_modules.timestamp \
+		$(FONTAWESOME_WEBFONT)
+	mkdir -p $(dir $@)
+	./node_modules/.bin/lessc --autoprefix --clean-css="--s0" $< $@
 
 .build/python-venv:
 	mkdir -p $(dir $@)

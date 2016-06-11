@@ -90,25 +90,33 @@ app.MainController = function(
     var circleRadius = 7;
 
     var viewpointStyleFn = function(feature) {
+      if (vm.adminUnit === 'place') {
+        return [new ol.style.Style({
+            text: new ol.style.Text({
+              text: '\uf28d',
+              font: 'normal 18px FontAwesome',
+              fill: circleFill
+            })    
+        })];
+      } else {
         return [new ol.style.Style({
             image: new ol.style.Circle({
                 fill: circleFill,
              //   stroke: circleStroke,
                 radius: circleRadius,
                 snapToPixel: false
-            }),
-//            fill: circleFill,
-//            stroke: circleStroke
+            })
         })];
+      }  
     };
 
     this.viewpointStyleSelectedFn = function(feature) {
         return  new ol.style.Style({
             text: new ol.style.Text({
-                text: feature.get('view_count').toString(),
-                fill: new ol.style.Fill({
-                    color: '#000'
-                }),
+              text: feature.get('view_count').toString(),
+              fill: new ol.style.Fill({
+                  color: '#000'
+              }),
             }),    
             fill: new ol.style.Fill({
                 color: 'rgba(255, 100, 50, 0.3)'
@@ -167,7 +175,7 @@ app.MainController = function(
             new ol.layer.Vector({
                 name: 'views',
                 source: this.viewpointsSource,
-                style:  viewpointStyleFn
+                style: viewpointStyleFn
             }),
             new ol.layer.Vector({
                 source: this.boundarySource,
