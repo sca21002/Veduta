@@ -46,8 +46,9 @@ app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
   '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
   '(CC BY 3.0 DE)</a>Datenquelle: Bayerische Vermessungsverwaltung – ' + 
   '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;'); 
-app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/mapbox/' +
-  'light-v9/tiles/{z}/{x}/{y}?access_token=' +
+
+app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
+  'sca21002/cip8kcaih002zcuns1cle262m/tiles/{z}/{x}/{y}?access_token=' +
   'pk.eyJ1Ijoic2NhMjEwMDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA');
 app.module.constant('mapboxAttributionHTML', 
   'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>');
