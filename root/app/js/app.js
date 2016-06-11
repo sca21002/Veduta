@@ -506,7 +506,7 @@ app.MainController = function(
                     if (vm.adminUnit === 'place') {
                         var pids =  angular.fromJson(feature.get('pid'));
                         if (pids.length === 1) { 
-                            $window.open(vedutaDigitool.getURL(pids[0]));
+                            vm.openExternalViewer_(pids[0]);
                         } else {
                           vm.views.sort(function(a,b) {
                             // a = 0 , b = -1 -> negative
@@ -581,6 +581,8 @@ app.MainController.prototype.zoomIn = function(view, event) {
     var vm = this;
     if (adminUnit === 'place') {
         console.log('open place');
+        var pid = (this.adminUnit === 'place') ? view.id : view.pid;
+        this.openExternalViewer_(pid);
         //this.open(view, event);
     } else {
 
@@ -652,17 +654,26 @@ app.MainController.prototype.unhover = function() {
     this.unselectPreviousFeatures();
 };
 
+/**
+ * @param {pid} pid Pid.
+ * @private
+ */
+app.MainController.prototype.openExternalViewer_ = function(pid) {
+    this.window.open(this.vedutaDigitool.getURL(pid));
+};
+
+
 
 /**
  * @param {Object} view View.
  * @param {jQuery.Event} event Event.
  * @export
  */
-app.MainController.prototype.open = function(view, event) {
-    console.log('in open');
+app.MainController.prototype.thumbnailClicked = function(view, event) {
+    console.log('in thumbnailClicked');
     event.stopPropagation();
     var pid = (this.adminUnit === 'place') ? view.id : view.pid;
-    this.window.open(this.vedutaDigitool.getURL(pid));
+    this.openExternalViewer_(pid);
 };
 
 

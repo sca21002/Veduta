@@ -45,7 +45,7 @@
                 </tfoot>    
                 <tbody>    
                 <tr ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
-                    <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.open(view, $event)"/></td> 
+                    <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></td> 
                     <td class="view-row">
                         <div id="title">{{view.title}}</div/>
                         <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
