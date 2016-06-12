@@ -36,6 +36,7 @@ goog.require('ol.style.Stroke');
 goog.require('ol.Attribution');
 goog.require('ol.control.Attribution');
 goog.require('ol.geom.Point');
+goog.require('ol.geom.LineString');
 
 
 /** @type {!angular.Module} **/
@@ -283,9 +284,9 @@ app.MainController = function(
         var rest = [];
         var features =  vm.viewpointsSource.getFeaturesInExtent(extent);
         features.forEach(function(feature) {
-            var pids;
-            var coord = feature.getGeometry().getCoordinates();
-            var distance = calculateDistance(coord, center);
+          var pids;
+          var geom = /** @type {ol.geom.LineString} */ (feature.getGeometry());
+          var distance = calculateDistance(geom.getCoordinates(), center);
             if (adminUnit === 'place') {
                 var titles = angular.fromJson(feature.get('title'));
                 pids   = angular.fromJson(feature.get('pid'));
@@ -671,7 +672,7 @@ app.MainController.prototype.unhover = function() {
 };
 
 /**
- * @param {pid} pid Pid.
+ * @param {string} pid Pid.
  * @private
  */
 app.MainController.prototype.openExternalViewer_ = function(pid) {
