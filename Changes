@@ -2,32 +2,12 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
-0.0.17    2016-06-12 11:11:47+02:00 Europe/Berlin
-
     - Views near the center of the map are ranked higher
-
-0.0.16    2016-06-11 22:01:35+02:00 Europe/Berlin
-
     - Fix attributions of map sources
-
-0.0.15    2016-06-11 21:26:44+02:00 Europe/Berlin
-
     - Click on a marker with 1 view triggers a list sort
-
-0.0.14    2016-06-11 17:21:17+02:00 Europe/Berlin
-
     - At the lowest level a click on the metadata opens the external viewer
-
-0.0.13    2016-06-11 16:35:03+02:00 Europe/Berlin
-
     - Additional informations in the list header are only shown in debug mode 
-
-0.0.12    2016-06-11 13:12:32+02:00 Europe/Berlin
-
     - Set language of the labels on the background map to german
-
-0.0.11    2016-06-11 12:34:19+02:00 Europe/Berlin
-
     - Different marker at the lowest level (level without clustering) 
 
 0.0.10    2016-06-10 07:43:11+02:00 Europe/Berlin
