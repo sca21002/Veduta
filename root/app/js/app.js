@@ -265,6 +265,11 @@ app.MainController = function(
         return view;
     }
 
+    function calculateDistance(coord1, coord2) {
+      var line = new ol.geom.LineString([coord1, coord2]);
+      return line.getLength();
+    }
+
     function updateList() {
         console.log('in updateList');
         var view = vm.map.getView();
@@ -273,11 +278,14 @@ app.MainController = function(
         var extent = view.calculateExtent(mapSize);
         var adminUnitSelected = vm.adminUnitSelected;
         var adminUnit = vm.adminUnit;
+        var center = view.getCenter();
         var views = [];
         var rest = [];
         var features =  vm.viewpointsSource.getFeaturesInExtent(extent);
         features.forEach(function(feature) {
             var pids;
+            var coord = feature.getGeometry().getCoordinates();
+            var distance = calculateDistance(coord, center);
             if (adminUnit === 'place') {
                 var titles = angular.fromJson(feature.get('title'));
                 pids   = angular.fromJson(feature.get('pid'));
@@ -291,7 +299,8 @@ app.MainController = function(
                                 id: pids[i],
                                 gmd: feature.get('gmd'),
                                 lkr: feature.get('lkr'),
-                                regbez: feature.get('regbez')
+                                regbez: feature.get('regbez'),
+                                distance: distance
                             });			 
                         }  else {
                             rest.push({
@@ -300,7 +309,8 @@ app.MainController = function(
                                 id: pids[i],
                                 gmd: feature.get('gmd'),
                                 lkr: feature.get('lkr'),
-                                regbez: feature.get('regbez')
+                                regbez: feature.get('regbez'),
+                                distance: distance
                             });			 
                         }
                     });    
@@ -311,12 +321,19 @@ app.MainController = function(
                 var view = getViewfromFeature(feature); 
                 view.icon = vedutaThumbnail.getURL(pids[index]);
                 view.pid = pids[index];
+                view.distance = distance;
                 if (isInSelection(feature, adminUnitSelected)) {
                     views.push(view);
                 } else {
                     rest.push(view);
                 }
             }     
+        });
+        views.sort(function(a,b) {
+          return a.distance - b.distance;
+        });
+        rest.sort(function(a,b) {
+          return a.distance - b.distance;
         });
         views = views.concat(rest);
         /**
