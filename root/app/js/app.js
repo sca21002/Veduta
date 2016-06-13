@@ -532,9 +532,9 @@ app.MainController = function(
                         });
                         vm.currentPage = 1;
                         $scope.$apply();
-                        if (pids.length === 1) { 
-                            vm.openExternalViewer_(pids[0]);
-                        }
+                        // if (pids.length === 1) { 
+                        //    vm.openExternalViewer_(pids[0]);
+                        // }
                     } else {
                         console.log('getViewFromFeature');
                         var view =  getViewfromFeature(feature);

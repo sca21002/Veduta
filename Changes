@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+    - Click on a marker does not open the external viewer anymore 
+
 0.0.11    2016-06-12 14:03:14+02:00 Europe/Berlin
 
     - Views near the center of the map are ranked higher
