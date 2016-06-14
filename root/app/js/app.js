@@ -245,22 +245,49 @@ app.MainController = function(
     };
 
     function getViewfromFeature(feature) {
-        var adminUnit = vm.adminUnit;        
-        var view = {
-            title: vedutaAdminUnit.getFullName(
-                feature.get('name'), 
-                adminUnit, 
+        var adminUnit = vm.adminUnit;
+        var view = {};
+        /**
+         * type{string}
+         * @export
+         */
+        view.title =  vedutaAdminUnit.getFullName(
+                feature.get('name'),
+                adminUnit,
                 feature.get('adm')
-            ),
-            name: feature.get('name'), 
-            admin: adminUnit,
-            viewCount: getViewCount(feature), 
-            id: feature.get('id'), 
-        };
+        );
+        /**
+         * type{string}
+         * @export
+         */
+        view.name = feature.get('name');
+        /**
+         * type{string}
+         * @export
+         */
+        view.admin = adminUnit;
+        /**
+         * type{number}
+         * @export
+         */
+        view.viewCount =  getViewCount(feature);
+        /**
+         * type{string}
+         * @export
+         */
+        view.id = feature.get('id');
         if (adminUnit === 'lkr' || adminUnit === 'gmd') {
-            view.regbez = feature.get('regbez'); 
+        /**
+         * type{string}
+         * @export
+         */
+            view.regbez = feature.get('regbez');
         }
         if (adminUnit === 'gmd') {
+        /**
+         * type{string}
+         * @export
+         */
             view.lkr = feature.get('lkr');
         }
         return view;
