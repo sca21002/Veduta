@@ -20,21 +20,22 @@ goog.require('veduta.Thumbnail');
  * @suppress {extraRequire}
  */
 goog.require('ngeo.mapDirective');
+/** @suppress {extraRequire} */
+goog.require('ngeo.DecorateGeolocation');
 goog.require('ol.Map');
 goog.require('ol.View');
 goog.require('ol.layer.Tile');
 goog.require('ol.layer.Vector');
-goog.require('ol.source.OSM');
+goog.require('ol.Geolocation');
 goog.require('ol.source.Vector');
 goog.require('ol.source.XYZ');
 goog.require('ol.format.GeoJSON');
+goog.require('ol.Feature');
 goog.require('ol.style.Text');
 goog.require('ol.style.Style');
 goog.require('ol.style.Fill');
 goog.require('ol.style.Circle');
 goog.require('ol.style.Stroke');
-goog.require('ol.Attribution');
-goog.require('ol.control.Attribution');
 goog.require('ol.geom.Point');
 goog.require('ol.geom.LineString');
 
@@ -57,7 +58,8 @@ app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
  */
 app.MainController = function(
     $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
-    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL,
+    ngeoDecorateGeolocation
     ) {
 
     var vm = this;
@@ -558,6 +560,45 @@ app.MainController = function(
     );
 
     this.getViewsDown(this.adminUnit);
+
+   /**
+   * @type {ol.Geolocation}
+   * @export
+   */
+  this.geolocation = new ol.Geolocation({
+    projection: vm.map.getView().getProjection()
+  });
+
+  var geolocation = this.geolocation;
+
+  var positionPoint = new ol.geom.Point([0, 0]);
+  var positionFeature = new ol.Feature(positionPoint);
+
+  var accuracyFeature = new ol.Feature();
+  geolocation.on('change:accuracyGeometry', function() {
+    accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+  });
+
+  var vectorLayer = new ol.layer.Vector({
+    source: new ol.source.Vector({
+      features: [positionFeature, accuracyFeature]
+    })
+  });
+
+  // Use vectorLayer.setMap(map) rather than map.addLayer(vectorLayer). This
+  // makes the vector layer "unmanaged", meaning that it is always on top.
+  vectorLayer.setMap(vm.map);
+
+  geolocation.on('change:position', function(e) {
+    var position = /** @type {ol.Coordinate} */ (geolocation.getPosition());
+    console.log('Position: ', position);
+    positionPoint.setCoordinates(position);
+    console.log('Position: ', positionPoint);
+    vm.map.getView().setCenter(position);
+    vm.map.getView().setZoom(17);
+  });
+
+  ngeoDecorateGeolocation(geolocation);
 };
 
 
