@@ -14,7 +14,9 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-7">
-            <div id="selected" class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}</div>  
+              <div class="admin-unit-selected">
+                  <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}</div>  
+              </div>    
             <div id="map" ngeo-map="ctrl.map"></div>
             <div id="attribution">
               <ul>
@@ -52,8 +54,8 @@
                   </tr>    
                 </tfoot>    
                 <tbody>    
-                <tr ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
-                    <td><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></td> 
+                <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
+                    <td class="thumbnail-column"><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></td> 
                     <td class="view-row">
                         <div id="title">{{view.title}}</div/>
                         <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
