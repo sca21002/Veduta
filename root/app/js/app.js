@@ -43,17 +43,10 @@ goog.require('ol.geom.LineString');
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
 app.module.constant('vedutaServerURL', 'http://rzbvm038.uni-regensburg.de/veduta-srv/');
-app.module.constant('boundaryAttributionHTML', 'Verwaltungsgrenzen <a rel=' +
-  '"license" href="http://creativecommons.org/licenses/by/3.0/de/">' +
-  '(CC BY 3.0 DE)</a> Datenquelle: Bayerische Vermessungsverwaltung – ' + 
-  '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>;'); 
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
   'sca21002/cip8kcaih002zcuns1cle262m/tiles/{z}/{x}/{y}?access_token=' +
   'pk.eyJ1Ijoic2NhMjEwMDIiLCJhIjoieWRaV0NrcyJ9.g6_31qK3mtTz_6gRrbuUGA');
-app.module.constant('mapboxAttributionHTML', 
-  'Tiles &copy; <a href="http://mapbox.com/">MapBox</a>');
-
 
 /**
  * @param {veduta.Locations} vedutaLocations service for locations of vedute
@@ -64,8 +57,8 @@ app.module.constant('mapboxAttributionHTML',
  */
 app.MainController = function(
     $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
-    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL, 
-    boundaryAttributionHTML, mapboxAttributionHTML) {
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL
+    ) {
 
     var vm = this;
 
@@ -84,7 +77,6 @@ app.MainController = function(
 
     var circleFill = new ol.style.Fill({
       color: 'rgba(150,28,49,0.4)'
-//      color: 'rgba(252,130,151,1)'
     });
     var circleStroke = new ol.style.Stroke({
         color: 'rgba(128,28,49,0)',
@@ -146,16 +138,8 @@ app.MainController = function(
     });
 
     this.boundarySource = new ol.source.Vector({
-        features: [],
-        attributions: new ol.Attribution({
-            html: boundaryAttributionHTML
-        })        
+        features: []
     });
-
-    var customAttribution = new ol.control.Attribution({
-      collapsed: false
-    });
-
 
     /**
     * @type {ol.Map}
@@ -166,13 +150,7 @@ app.MainController = function(
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
                   tileSize: [512, 512],
-                  url: mapboxURL,
-                  attributions: [
-                      new ol.Attribution({
-                          html: mapboxAttributionHTML
-                      }),
-                      ol.source.OSM.ATTRIBUTION
-                  ]
+                  url: mapboxURL
                 }),
             }),
             new ol.layer.Vector({
@@ -199,10 +177,7 @@ app.MainController = function(
                 [10.581, 49.682], 'EPSG:4326', 'EPSG:3857'
              ),
             zoom: 8
-        }),
-        controls:  ol.control.defaults(
-          { attribution: false }
-        ).extend([customAttribution])
+        })
     });
 
     
