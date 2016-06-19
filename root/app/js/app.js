@@ -197,7 +197,7 @@ app.MainController = function(
                         color: [255,255,255,0]
                     }),
                     stroke: new ol.style.Stroke({
-                        color: [224,51,51,0.7],
+                        color: shadeRGBColor(vm.colorBasis, 0.75),
                         width: 1
                     })
                 })
