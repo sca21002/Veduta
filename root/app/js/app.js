@@ -700,10 +700,10 @@ app.MainController.prototype.zoomIn = function(view, event) {
         // view.admin should be equal to $scope.admin?
         this.adminUnitSelected = { 
             id: view.id, 
-            fullname: view.title, 
             name: view.name, 
             admin: view.admin 
         };
+        this.adminUnitSelected['fullname'] = view.title;
                 
         
         var nextAdmin = this.vedutaAdminUnit.decreaseAdminUnit(adminUnit);
