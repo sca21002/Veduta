@@ -1,4 +1,3 @@
-goog.provide('app_veduta');
 goog.provide('app.MainController');
 
 goog.require('veduta');
@@ -44,6 +43,7 @@ goog.require('ol.geom.LineString');
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
 app.module.constant('vedutaServerURL', 'http://rzbvm038.uni-regensburg.de/veduta-srv/');
+//app.module.constant('vedutaServerURL', 'http://localhost:8888/');
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
   'sca21002/cip8kcaih002zcuns1cle262m/tiles/{z}/{x}/{y}?access_token=' +
@@ -70,6 +70,11 @@ app.MainController = function(
     */
     vm.adminUnitSelected = '';
     this.adminUnit = 'lkr';
+    this.viewCountMax = 378;
+    this.viewCountMin = 1;
+    this.percentMin = 0.25;
+    this.colorBasis = "rgba(150,28,49,1)";
+
 
     this.vedutaAdminUnit = vedutaAdminUnit;
     this.vedutaBoundary = vedutaBoundary;
@@ -77,13 +82,38 @@ app.MainController = function(
     this.window = $window;
     this.debug = $location.search().debug;
 
-    var circleFill = new ol.style.Fill({
-      color: 'rgba(150,28,49,0.4)'
-    });
+    function getPercent(x) {
+      var pMin = vm.percentMin;
+      var xMax = vm.viewCountMax;
+      var xMin = vm.viewCountMin;
+      var denominator = xMax - xMin;
+      return (pMin * xMax - xMin)/denominator + (1 -pMin) / denominator * x;
+    }
+
+    // http://stackoverflow.com/questions/5560248    
+    function shadeRGBColor(color, percent) {
+        var f=color.split(","),
+            t=percent<0?0:255,
+            p=percent<0?percent*-1:percent,
+            R=parseInt(f[0].slice(5), 10),
+            G=parseInt(f[1], 10),
+            B=parseInt(f[2], 10),
+            a=parseInt(f[3], 10);
+        return "rgba("+(Math.round((t-R)*p)+R)+","+(Math.round((t-G)*p)+G)+","+(Math.round((t-B)*p)+B)+",1)";
+    }
+
+    var circleFillFn = function(feature) {
+      var viewCount = parseInt(feature.get('view_count'), 10);
+      return new ol.style.Fill({
+        color: shadeRGBColor(vm.colorBasis, 1 - getPercent(viewCount))
+      });
+    };
+
     var circleStroke = new ol.style.Stroke({
         color: 'rgba(128,28,49,0)',
         width: 1.25
     });
+
     var circleRadius = 7;
 
     var viewpointStyleFn = function(feature) {
@@ -92,13 +122,13 @@ app.MainController = function(
             text: new ol.style.Text({
               text: '\uf28d',
               font: 'normal 18px FontAwesome',
-              fill: circleFill
+              fill: circleFillFn(feature)
             })    
         })];
       } else {
         return [new ol.style.Style({
             image: new ol.style.Circle({
-                fill: circleFill,
+                fill: circleFillFn(feature),
              //   stroke: circleStroke,
                 radius: circleRadius,
                 snapToPixel: false
@@ -182,7 +212,6 @@ app.MainController = function(
         })
     });
 
-    
     /**
     * @type {number|undefined}
     * @export
@@ -382,13 +411,24 @@ app.MainController = function(
         } else {
           vm.map.un('postcompose', vm.moveFeatureDown);  
           var pointFeatures = []; 
+          delete vm.viewCountMax;
+          delete vm.viewCountMin;
           vm.features.forEach(function(feature) {
+                var viewCount = parseInt(feature.get('view_count'), 10);
+                if (vm.viewCountMax == undefined || vm.viewCountMax < viewCount) {
+                    vm.viewCountMax = viewCount;
+                }
+                if (vm.viewCountMin == undefined || vm.viewCountMin > viewCount) {
+                    vm.viewCountMin = viewCount;
+                }
                 var geom = /** @type {ol.geom.LineString} */ (feature.getGeometry());
                 var coord = geom.getLastCoordinate();
                 var pointFeature = feature.clone();
                 pointFeature.setGeometry(new ol.geom.Point(coord));
                 pointFeatures.push(pointFeature);
           });
+          console.log('Max: ', vm.viewCountMax);
+          console.log('Min: ', vm.viewCountMin);
           vm.viewpointsSource.addFeatures(pointFeatures);
           updateList();
           $scope.$apply();
@@ -435,13 +475,24 @@ app.MainController = function(
                 var geojsonFormat = new ol.format.GeoJSON();
                 vm.features = geojsonFormat.readFeatures(geoJSON);
                 var pointFeatures = []; 
+                delete vm.viewCountMax;
+                delete vm.viewCountMin;
                 vm.features.forEach(function(feature) {
+                    var viewCount = parseInt(feature.get('view_count'), 10);
+                    if (vm.viewCountMax == undefined || vm.viewCountMax < viewCount) {
+                        vm.viewCountMax = viewCount;
+                    }
+                    if (vm.viewCountMin == undefined || vm.viewCountMin > viewCount) {
+                        vm.viewCountMin = viewCount;
+                    }
                     var geom = /** @type {ol.geom.LineString} */ (feature.getGeometry());
                     var coord = geom.getLastCoordinate();
                     var pointFeature = feature.clone();
                     pointFeature.setGeometry(new ol.geom.Point(coord));
                     pointFeatures.push(pointFeature);
                 });
+                console.log('Max: ', vm.viewCountMax);
+                console.log('Min: ', vm.viewCountMin);
                 vm.viewpointsSource.addFeatures(pointFeatures);
                 updateList();
                 //$scope.$apply();
