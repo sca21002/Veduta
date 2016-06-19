@@ -34,16 +34,17 @@
               <table class="table table-condensed table-hover">
                 <thead> 
                   <tr>
-                    <td colspan="2">
+                    <td>
                       <div class="text-right"> 
                         <span ng-show="ctrl.debug">Zoom: {{ctrl.zoom}} - Ebene: {{ctrl.admin_long}} - Ansichten: {{ctrl.totalViews}}</span>
                         <span> Seite: {{ctrl.currentPage}}/{{ctrl.numPages}}</span>
                       </div>
-                  </td>    
+                    </td>    
+                  </tr>  
                 </thead>
                 <tfoot>
                   <tr>
-                    <td colspan="2" class="text-center">
+                    <td class="text-center">
                       <uib-pagination 
                         ng-model="ctrl.currentPage" 
                         items-per-page ="ctrl.itemsPerPage"
@@ -59,14 +60,16 @@
                 </tfoot>    
                 <tbody>    
                 <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
-                    <td class="thumbnail-column"><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></td> 
-                    <td class="view-row">
+                  <td>
+                    <div class="thumb-container"><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></div> 
+                    <div class="view-row">
                         <div id="title">{{view.title}}</div/>
                         <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
                         <div ng-show="view.lkr">Kreis: {{view.lkr}}</div>
                         <div ng-show="view.regbez">{{view.regbez}}</div>
                         <div>{{view.viewCount}}</div>
-                    </td>  
+                    </div>
+                  </td>  
                 </tr>
                 </tbody>  
               </table> 
