@@ -2,6 +2,8 @@ This file documents the revision history for Perl web application Veduta.
 
 {{$NEXT}}
 
+0.0.12    2016-06-19 13:46:53+02:00 Europe/Berlin
+
     - Add a geolocation service
     - Click on a marker does not open the external viewer anymore 
 
