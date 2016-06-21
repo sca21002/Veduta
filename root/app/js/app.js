@@ -65,6 +65,25 @@ app.MainController = function(
     var vm = this;
 
     /**
+     *  * @type {number}
+     *  * @export
+    */
+    this.radiusMax = 16;
+
+    /**
+     *  * @type {number}
+     *  * @export
+    */
+    this.radiusMin = 6;
+
+    /**
+     *  * @type {number}
+     *  * @export
+    */
+    this.alpha = 0.4;
+
+
+    /**
      *  * @type {string}
      *  * @export
     */
@@ -72,8 +91,7 @@ app.MainController = function(
     this.adminUnit = 'lkr';
     this.viewCountMax = 378;
     this.viewCountMin = 1;
-    this.percentMin = 0.25;
-    this.colorBasis = "rgba(150,28,49,1)";
+    this.colorBasis = "rgba(150,28,49,0.4)";
 
 
     this.vedutaAdminUnit = vedutaAdminUnit;
@@ -83,29 +101,21 @@ app.MainController = function(
     this.debug = $location.search().debug;
 
     function getPercent(x) {
-      var pMin = vm.percentMin;
+      var pMin = vm.radiusMin/vm.radiusMax;
       var xMax = vm.viewCountMax;
       var xMin = vm.viewCountMin;
       var denominator = xMax - xMin;
-      return (pMin * xMax - xMin)/denominator + (1 -pMin) / denominator * x;
-    }
-
-    // http://stackoverflow.com/questions/5560248    
-    function shadeRGBColor(color, percent) {
-        var f=color.split(","),
-            t=percent<0?0:255,
-            p=percent<0?percent*-1:percent,
-            R=parseInt(f[0].slice(5), 10),
-            G=parseInt(f[1], 10),
-            B=parseInt(f[2], 10),
-            a=parseInt(f[3], 10);
-        return "rgba("+(Math.round((t-R)*p)+R)+","+(Math.round((t-G)*p)+G)+","+(Math.round((t-B)*p)+B)+",1)";
+      if (denominator === 0)  {
+        return 1;  
+      } else {
+        return (pMin * xMax - xMin)/denominator + (1 -pMin) / denominator * x;
+      }
     }
 
     var circleFillFn = function(feature) {
       var viewCount = parseInt(feature.get('view_count'), 10);
       return new ol.style.Fill({
-        color: shadeRGBColor(vm.colorBasis, 1 - getPercent(viewCount))
+        color: "rgba(150,28,49," + vm.alpha + ")"
       });
     };
 
@@ -114,9 +124,8 @@ app.MainController = function(
         width: 1.25
     });
 
-    var circleRadius = 7;
-
     var viewpointStyleFn = function(feature) {
+      var viewCount = parseInt(feature.get('view_count'), 10);  
       if (vm.adminUnit === 'place') {
         return [new ol.style.Style({
             text: new ol.style.Text({
@@ -130,7 +139,7 @@ app.MainController = function(
             image: new ol.style.Circle({
                 fill: circleFillFn(feature),
              //   stroke: circleStroke,
-                radius: circleRadius,
+                radius: getPercent(viewCount) * vm.radiusMax,
                 snapToPixel: false
             })
         })];
@@ -197,7 +206,7 @@ app.MainController = function(
                         color: [255,255,255,0]
                     }),
                     stroke: new ol.style.Stroke({
-                        color: shadeRGBColor(vm.colorBasis, 0.75),
+                        color: vm.colorBasis,
                         width: 1
                     })
                 })
@@ -787,5 +796,15 @@ app.MainController.prototype.thumbnailClicked = function(view, event) {
     this.openExternalViewer_(pid);
 };
 
+/**
+ * @export
+ */
+app.MainController.prototype.changeStyle = function() {
+    console.log('In ChangeStyle');
+    var features = this.viewpointsSource.getFeatures();
+    features.forEach(function(ftr) {
+      ftr.setStyle(this.featureStyleFn);
+    }.bind(this));
+};
 
 app.module.controller('MainController', app.MainController);

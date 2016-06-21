@@ -14,9 +14,9 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-7">
-              <div class="admin-unit-selected">
-                  <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}</div>  
-              </div>    
+            <div class="admin-unit-selected">
+              <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}</div>  
+            </div>    
             <div id="map" ngeo-map="ctrl.map"></div>
             <div id="attribution">
               <ul>
@@ -25,10 +25,28 @@
                   <li>© <a href='www.openstreetmap.org/copyright'>OpenStreetMap-Mitwirkende</a></li>
               </ul>    
             </div>
-            <p>
+            <div>
                <label for="checkbox">Karte auf meinen Standort zentrieren:</label>
                <input id="checkbox" type="checkbox" ng-model="ctrl.geolocation.tracking"  />
-             </p>
+            </div>
+            <div>
+             <label>
+               Radius (max.)
+               <input type="text" ng-model="ctrl.radiusMax" ng-change="ctrl.changeStyle()"></input>
+             </label>
+            </div>
+            <div>
+               <label>
+                  Radius (min.)
+                  <input type="text" ng-model="ctrl.radiusMin" ng-change="ctrl.changeStyle()"></input>
+               </label>
+            </div> 
+            <div>
+               <label>
+                  Transparenz
+                  <input type="text" ng-model="ctrl.alpha" ng-change="ctrl.changeStyle()"></input>
+               </label>
+            </div> 
           </div>
             <div class="col-md-5">
               <table class="table table-condensed table-hover">
