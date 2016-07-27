@@ -13,6 +13,8 @@ goog.require('veduta.AdminUnit');
 /** @suppress {extraRequire} */
 goog.require('veduta.Thumbnail');
 
+goog.require('veduta.control.Geolocation');
+
 /**
  * This goog.require is needed because it provides 'ngeo-map' used in
  * the template.
@@ -20,7 +22,6 @@ goog.require('veduta.Thumbnail');
  */
 goog.require('ngeo.mapDirective');
 /** @suppress {extraRequire} */
-goog.require('ngeo.DecorateGeolocation');
 goog.require('ol.Map');
 goog.require('ol.View');
 goog.require('ol.layer.Tile');
@@ -58,8 +59,7 @@ app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
  */
 app.MainController = function(
     $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
-    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL,
-    ngeoDecorateGeolocation
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL
     ) {
 
     var vm = this;
@@ -182,6 +182,8 @@ app.MainController = function(
         features: []
     });
 
+    this.geolocationControl = new veduta.control.Geolocation();
+
     /**
     * @type {ol.Map}
     * @export
@@ -220,6 +222,8 @@ app.MainController = function(
             zoom: 8
         })
     });
+
+    this.map.addControl(this.geolocationControl);
 
     /**
     * @type {number|undefined}
@@ -621,44 +625,6 @@ app.MainController = function(
 
     this.getViewsDown(this.adminUnit);
 
-   /**
-   * @type {ol.Geolocation}
-   * @export
-   */
-  this.geolocation = new ol.Geolocation({
-    projection: vm.map.getView().getProjection()
-  });
-
-  var geolocation = this.geolocation;
-
-  var positionPoint = new ol.geom.Point([0, 0]);
-  var positionFeature = new ol.Feature(positionPoint);
-
-  var accuracyFeature = new ol.Feature();
-  geolocation.on('change:accuracyGeometry', function() {
-    accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
-  });
-
-  var vectorLayer = new ol.layer.Vector({
-    source: new ol.source.Vector({
-      features: [positionFeature, accuracyFeature]
-    })
-  });
-
-  // Use vectorLayer.setMap(map) rather than map.addLayer(vectorLayer). This
-  // makes the vector layer "unmanaged", meaning that it is always on top.
-  vectorLayer.setMap(vm.map);
-
-  geolocation.on('change:position', function(e) {
-    var position = /** @type {ol.Coordinate} */ (geolocation.getPosition());
-    console.log('Position: ', position);
-    positionPoint.setCoordinates(position);
-    console.log('Position: ', positionPoint);
-    vm.map.getView().setCenter(position);
-    vm.map.getView().setZoom(17);
-  });
-
-  ngeoDecorateGeolocation(geolocation);
 };
 
 
