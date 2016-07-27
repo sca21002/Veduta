@@ -68,7 +68,7 @@ app.MainController = function(
      *  * @type {number}
      *  * @export
     */
-    this.radiusMax = 16;
+    this.radiusMax = 14;
 
     /**
      *  * @type {number}
@@ -794,17 +794,6 @@ app.MainController.prototype.thumbnailClicked = function(view, event) {
     event.stopPropagation();
     var pid = (this.adminUnit === 'place') ? view.id : view.pid;
     this.openExternalViewer_(pid);
-};
-
-/**
- * @export
- */
-app.MainController.prototype.changeStyle = function() {
-    console.log('In ChangeStyle');
-    var features = this.viewpointsSource.getFeatures();
-    features.forEach(function(ftr) {
-      ftr.setStyle(this.featureStyleFn);
-    }.bind(this));
 };
 
 app.module.controller('MainController', app.MainController);
