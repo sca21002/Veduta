@@ -56,7 +56,6 @@ ol.inherits(veduta.control.Geolocation, ol.control.Control);
  */
 veduta.control.Geolocation.prototype.handleClick_ = function(event) {
   event.preventDefault();
-  console.log('in handleClick_');
   this.handleGeolocation_();
 };
 
@@ -65,7 +64,6 @@ veduta.control.Geolocation.prototype.handleClick_ = function(event) {
  */
 veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
 
-   
   var map = this.getMap();
   if (!map) {
     return;
@@ -106,11 +104,10 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
 
 
   // listen to changes in position
-  ol.events.listenOnce(
+  ol.events.listen(
     this.geolocation_,
     ol.Object.getChangeEventType(ol.GeolocationProperty.POSITION),
     function(e) {
-      console.log('In position');
       var position = /** @type {ol.Coordinate} */ (this.geolocation_.getPosition());
       positionPoint.setCoordinates(position);
       map.getView().setCenter(position);
@@ -120,15 +117,26 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
   );
 
   // listen to changes of the geometry of accuracy
-  ol.events.listenOnce(
+  ol.events.listen(
     this.geolocation_,
     ol.Object.getChangeEventType(ol.GeolocationProperty.ACCURACY_GEOMETRY),
     function(e) {
-      console.log('In accuracy');
       var accuracyGeometry = this.geolocation_.getAccuracyGeometry();
       accuracyFeature.setGeometry(this.geolocation_.getAccuracyGeometry());
     },
     this
   );
+
+  ol.events.listen(
+    this.geolocation_,    
+    ol.events.EventType.ERROR,
+    function(e) {
+       console.log('ERROR: ', e.message); 
+       alert('Fehler bei der Ortsbestimmung: '+  e.message);
+    }, 
+    this
+  );   
+
+
 
 }

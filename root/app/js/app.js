@@ -13,8 +13,6 @@ goog.require('veduta.AdminUnit');
 /** @suppress {extraRequire} */
 goog.require('veduta.Thumbnail');
 
-goog.require('veduta.control.Geolocation');
-
 /**
  * This goog.require is needed because it provides 'ngeo-map' used in
  * the template.
@@ -26,7 +24,6 @@ goog.require('ol.Map');
 goog.require('ol.View');
 goog.require('ol.layer.Tile');
 goog.require('ol.layer.Vector');
-goog.require('ol.Geolocation');
 goog.require('ol.source.Vector');
 goog.require('ol.source.XYZ');
 goog.require('ol.format.GeoJSON');
@@ -38,12 +35,14 @@ goog.require('ol.style.Circle');
 goog.require('ol.style.Stroke');
 goog.require('ol.geom.Point');
 goog.require('ol.geom.LineString');
+goog.require('veduta.control.Geolocation');
 
 
 /** @type {!angular.Module} **/
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
-app.module.constant('vedutaServerURL', 'http://rzbvm038.uni-regensburg.de/veduta-srv/');
+app.module.constant('vedutaServerURL', 
+        'http://rzbvm038.uni-regensburg.de/veduta-srv/');
 //app.module.constant('vedutaServerURL', 'http://localhost:8888/');
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
@@ -59,8 +58,7 @@ app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
  */
 app.MainController = function(
     $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
-    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL
-    ) {
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL) {
 
     var vm = this;
 
@@ -178,11 +176,11 @@ app.MainController = function(
         features: []
     });
 
+    this.geolocationControl = new veduta.control.Geolocation();
+
     this.boundarySource = new ol.source.Vector({
         features: []
     });
-
-    this.geolocationControl = new veduta.control.Geolocation();
 
     /**
     * @type {ol.Map}
@@ -624,6 +622,12 @@ app.MainController = function(
     );
 
     this.getViewsDown(this.adminUnit);
+
+    if ("geolocation" in navigator) {
+        console.log('Geolocation vorhanden');
+    } else {
+        console.log('Geolocation MICHT vorhanden');
+    }
 
 };
 
