@@ -11,10 +11,6 @@
     bottom: 0.5em;
 }
 
-.ol-attribution {
-    top: 0.5em;
-    bottom: unset;
-}
 
 .veduta-geolocation {
     font-family: FontAwesome;
@@ -24,27 +20,26 @@
     bottom: 5em;
 }
 
-#attribution {
-  text-align: left;
+.ol-control button {
+  background: rgba(102,102,102,0.5);
 }
 
-#attribution ul {
-    color: #000;
-    font-size: 0.7rem;
-    line-height: 1.375em;
-    margin: 0;
-    padding: 0;
+.ol-control button:hover,
+.ol-control button:focus {
+  background: rgba(102,102,102,0.7);
 }
 
-#attribution li {
-    display: inline;
-    line-height: inherit;
-    list-style: outside none none;
-    color: #333;
+
+.ol-control.ol-attribution {
+    position: static
 }
 
-#attribution li a {
-    color: inherit;
+.ol-attribution {
+    text-align: left;
+}
+
+.ol-attribution a {
+  color: #333
 }
 
 .admin-unit-selected {

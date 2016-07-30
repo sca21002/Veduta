@@ -178,7 +178,25 @@ app.MainController = function(
 
     this.geolocationControl = new veduta.control.Geolocation();
 
+    this.zoomControl = new ol.control.Zoom({
+      zoomInTipLabel: undefined,
+      zoomOutTipLabel: undefined      
+    });
+
+    this.attributionControl = new ol.control.Attribution({
+      // className: 'my-atrritbution',  
+      target: document.getElementById('attribution'),
+      collapsible: false,
+      collapsed: false
+    });
+
     this.boundarySource = new ol.source.Vector({
+        attributions: [
+          new ol.Attribution({
+            html: 'Datenquelle: Bayerische Vermessungsverwaltung – ' +
+                   '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>'
+          })       
+        ],
         features: []
     });
 
@@ -190,6 +208,16 @@ app.MainController = function(
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.XYZ({
+                  attributions: [
+                    new ol.Attribution({
+                        html: '© <a href=i"https://www.mapbox.com/about/maps/">' +
+                              'Mapbox</a>'
+                    }),
+                    new ol.Attribution({
+                      html:  '© <a href="www.openstreetmap.org/copyright">' + 
+                             'OpenStreetMap-Mitwirkende</a>'
+                    })
+                  ],
                   tileSize: [512, 512],
                   url: mapboxURL
                 }),
@@ -213,6 +241,11 @@ app.MainController = function(
 
             })
         ],
+        controls: [
+          this.geolocationControl,
+          this.zoomControl,
+          this.attributionControl
+        ],
         view: new ol.View({
             center: ol.proj.transform(
                 [10.581, 49.682], 'EPSG:4326', 'EPSG:3857'
@@ -220,8 +253,6 @@ app.MainController = function(
             zoom: 8
         })
     });
-
-    this.map.addControl(this.geolocationControl);
 
     /**
     * @type {number|undefined}
