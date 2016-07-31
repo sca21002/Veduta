@@ -2,6 +2,8 @@ goog.provide('app.MainController');
 
 goog.require('veduta');
 
+goog.require('ol');
+
 /** @suppress {extraRequire} */
 goog.require('veduta.Boundary');
 /** @suppress {extraRequire} */
@@ -27,7 +29,6 @@ goog.require('ol.layer.Vector');
 goog.require('ol.source.Vector');
 goog.require('ol.source.XYZ');
 goog.require('ol.format.GeoJSON');
-goog.require('ol.Feature');
 goog.require('ol.style.Text');
 goog.require('ol.style.Style');
 goog.require('ol.style.Fill');
@@ -36,6 +37,9 @@ goog.require('ol.style.Stroke');
 goog.require('ol.geom.Point');
 goog.require('ol.geom.LineString');
 goog.require('veduta.control.Geolocation');
+goog.require('ol.control.Zoom');
+goog.require('ol.control.Attribution');
+goog.require('ol.Attribution');
 
 
 /** @type {!angular.Module} **/

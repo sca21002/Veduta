@@ -11,10 +11,11 @@
   "dependencies": {
     "angular": "^1.5.5",
     "angular-gettext": "^2.2.1",
+    "angular-ui-date": "1.1.1",
     "bootstrap": "^3.3.6",
     "font-awesome": "^4.6.1",
     "ngeo": "^2.1.0-dev.13",
-    "openlayers": "^3.15.1"
+    "openlayers": "^3.17.1"
   },
   "devDependencies": {
     "closure-util": "^1.13.0",

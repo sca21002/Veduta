@@ -6,6 +6,7 @@ VEDUTA_APPS_LESS_FILES := $(shell find less -type f -name '*.less')
 VEDUTA_APPS_LIBS_JS_FILES += \
 	node_modules/angular/angular.min.js \
 	node_modules/angular-gettext/dist/angular-gettext.min.js \
+	node_modules/angular-ui-date/dist/date.js \
 	node_modules/ui-bootstrap-custom/ui-bootstrap-custom-tpls-1.3.2.min.js
 
 EXTERNS_ANGULAR = .build/externs/angular-1.5.js
@@ -47,7 +48,7 @@ serve: .build/node_modules.timestamp $(FONTAWESOME_WEBFONT)
 		$(EXTERNS_FILES) \
 		.build/node_modules.timestamp
 	mkdir -p $(dir $@)
-	./node_modules/.bin/closure-util build $< $@
+	/usr/bin/node buildtools/build.js $< $@
 	echo '//# sourceMappingURL=$*.js.map' >> $@
 
 .PRECIOUS: .build/app-%.json

@@ -6,6 +6,12 @@ goog.require('ol.Geolocation');
 goog.require('ol');
 goog.require('ol.control.Control');
 goog.require('ol.css');
+goog.require('ol.geom.Point');
+goog.require('ol.style.Circle');
+goog.require('ol.style.Style');
+goog.require('ol.style.Fill');
+goog.require('ol.layer.Vector');
+goog.require('ol.source.Vector');
 
 
 /**
