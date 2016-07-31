@@ -104,7 +104,7 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
 
 
   // listen to changes in position
-  ol.events.listen(
+  ol.events.listenOnce(
     this.geolocation_,
     ol.Object.getChangeEventType(ol.GeolocationProperty.POSITION),
     function(e) {
@@ -117,7 +117,7 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
   );
 
   // listen to changes of the geometry of accuracy
-  ol.events.listen(
+  ol.events.listenOnce(
     this.geolocation_,
     ol.Object.getChangeEventType(ol.GeolocationProperty.ACCURACY_GEOMETRY),
     function(e) {
@@ -127,7 +127,7 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
     this
   );
 
-  ol.events.listen(
+  ol.events.listenOnce(
     this.geolocation_,    
     ol.events.EventType.ERROR,
     function(e) {

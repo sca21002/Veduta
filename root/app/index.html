@@ -41,8 +41,11 @@
                         total-items="ctrl.totalViews"
                         max-size = 6
                         num-pages="ctrl.numPages"
-                        previous-text="|&lt;"
-                        next-text="&gt;|"
+                        boundary-links="true"
+                        first-text="|&lt;"
+                        previous-text="&lt;"
+                        next-text="&gt;"
+                        last-text="&gt;|"
                         ng-change="ctrl.pageChanged()"
                       ></uib-pagination>
                     </td>    
