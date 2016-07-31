@@ -5,3 +5,36 @@
 @import 'base.less';
 @import 'map.less';
 @import 'table.less';
+
+@topbar-height: 4.5rem;
+
+
+html, body {
+  position: relative;
+  height: 100%;
+  li {
+    list-style: none;
+  }
+}
+
+body {
+  padding-top: @topbar-height;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: @topbar-height;
+  z-index: @zindex-navbar-fixed;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAAAAABzHgM7AAAAAnRSTlMAAHaTzTgAAAARSURBVHgBY3iKBFEAOp/+MgB+UQnYeBZPWAAAAABJRU5ErkJggg==');
+}
+
+.title {
+    padding-left: 30px;
+    font-size: 20px;
+    line-height: @topbar-height;
+    width: 100%; 
+    height: @topbar-height;    
+}
