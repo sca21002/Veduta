@@ -377,9 +377,10 @@ app.MainController = function(
                                 title: title, 
                                 icon: vedutaThumbnail.getURL(pids[i]), 
                                 id: pids[i],
-                                gmd: feature.get('gmd'),
-                                lkr: feature.get('lkr'),
-                                regbez: feature.get('regbez'),
+                                // github.com/sca21002/Veduta/issues/22
+                                // gmd: feature.get('gmd'),
+                                // lkr: feature.get('lkr'),
+                                // regbez: feature.get('regbez'),
                                 distance: distance
                             });			 
                         }  else {
@@ -387,9 +388,10 @@ app.MainController = function(
                                 title: title, 
                                 icon: vedutaThumbnail.getURL(pids[i]), 
                                 id: pids[i],
-                                gmd: feature.get('gmd'),
-                                lkr: feature.get('lkr'),
-                                regbez: feature.get('regbez'),
+                                // github.com/sca21002/Veduta/issues/22
+                                // gmd: feature.get('gmd'),
+                                // lkr: feature.get('lkr'),
+                                // regbez: feature.get('regbez'),
                                 distance: distance
                             });			 
                         }
