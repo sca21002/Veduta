@@ -89,7 +89,7 @@ app.MainController = function(
      *  * @type {string}
      *  * @export
     */
-    vm.adminUnitSelected = '';
+    vm.adminUnitSelected = null;
     this.adminUnit = 'lkr';
     this.viewCountMax = 378;
     this.viewCountMin = 1;
@@ -799,6 +799,18 @@ app.MainController.prototype.thumbnailClicked = function(view, event) {
     event.stopPropagation();
     var pid = (this.adminUnit === 'place') ? view.id : view.pid;
     this.openExternalViewer_(pid);
+};
+
+/**
+ * @param {Object} adminUnitSelected adminUnitSelected.
+ * @param {jQuery.Event} event Event.
+ * @export
+ */
+app.MainController.prototype.unselectAdminUnit = function(adminUnitSelected, event) {
+    console.log('in unselctAdminUnit: ', adminUnitSelected);
+    event.stopPropagation();
+    this.boundarySource.clear();
+    this.adminUnitSelected = null;    
 };
 
 app.module.controller('MainController', app.MainController);

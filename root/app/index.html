@@ -15,7 +15,9 @@
         <div class="row">
           <div class="col-md-7">
             <div class="admin-unit-selected">
-              <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}</div>  
+              <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}  
+                <span class="fa fa-times-circle" ng-click="ctrl.unselectAdminUnit(ctrl.adminUnitSelected, $event)"></span>
+              </div>  
             </div>    
             <div id="map" ngeo-map="ctrl.map"></div>
             <div id="attribution"></div>
