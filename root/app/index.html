@@ -23,6 +23,7 @@
             <div id="attribution"></div>
           </div>
             <div class="col-md-5">
+              <div class="list">
               <table class="table table-condensed table-hover">
                 <thead> 
                   <tr>
@@ -34,25 +35,6 @@
                     </td>    
                   </tr>  
                 </thead>
-                <tfoot>
-                  <tr>
-                    <td class="text-center">
-                      <uib-pagination 
-                        ng-model="ctrl.currentPage" 
-                        items-per-page ="ctrl.itemsPerPage"
-                        total-items="ctrl.totalViews"
-                        max-size = 3
-                        num-pages="ctrl.numPages"
-                        boundary-links="true"
-                        first-text="|&lt;"
-                        previous-text="&lt;"
-                        next-text="&gt;"
-                        last-text="&gt;|"
-                        ng-change="ctrl.pageChanged()"
-                      ></uib-pagination>
-                    </td>    
-                  </tr>    
-                </tfoot>    
                 <tbody>    
                 <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
                   <td>
@@ -68,6 +50,22 @@
                 </tr>
                 </tbody>  
               </table> 
+              </div>
+              <div class="text-center">
+                <uib-pagination 
+                  ng-model="ctrl.currentPage" 
+                  items-per-page ="ctrl.itemsPerPage"
+                  total-items="ctrl.totalViews"
+                  max-size = 3
+                  num-pages="ctrl.numPages"
+                  boundary-links="true"
+                  first-text="|&lt;"
+                  previous-text="&lt;"
+                  next-text="&gt;"
+                  last-text="&gt;|"
+                  ng-change="ctrl.pageChanged()"
+                ></uib-pagination>
+              </div>    
             </div>    
           </div>
         </div>  
