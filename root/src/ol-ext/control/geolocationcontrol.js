@@ -96,7 +96,7 @@ veduta.control.Geolocation.prototype.handleGeolocation_ = function() {
   var accuracyFeature = new ol.Feature();
   accuracyFeature.setStyle(
     new ol.style.Style({      
-      fill: new ol.style.Fill({color: 'rgba(128,128,128,0.2)'})
+      fill: new ol.style.Fill({color: 'rgba(128,128,128,0.1)'})
     })
   );
 
