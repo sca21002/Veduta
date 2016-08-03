@@ -183,8 +183,8 @@ app.MainController = function(
     this.geolocationControl = new veduta.control.Geolocation();
 
     this.zoomControl = new ol.control.Zoom({
-      zoomInTipLabel: undefined,
-      zoomOutTipLabel: undefined      
+      zoomInTipLabel: 'Vergrößerern',
+      zoomOutTipLabel: 'Verkleinern'      
     });
 
     this.attributionControl = new ol.control.Attribution({

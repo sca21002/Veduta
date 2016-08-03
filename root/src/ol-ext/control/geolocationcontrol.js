@@ -37,8 +37,12 @@ veduta.control.Geolocation = function() {
    */
   this.labelNode_ = document.createTextNode(label);
 
+  var tipLabel = 'Mein Standort';
+   
+
   var button = document.createElement('button');
   button.setAttribute('type', 'button');
+  button.title = tipLabel;
   button.appendChild(this.labelNode_);
 
   var cssClasses = 'veduta-geolocation' + ' ' + ol.css.CLASS_UNSELECTABLE +
