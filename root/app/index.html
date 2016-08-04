@@ -16,7 +16,7 @@
           <div class="col-md-7">
             <div class="admin-unit-selected">
               <div class="text-left" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}}  
-                <span class="fa fa-times-circle" ng-click="ctrl.unselectAdminUnit(ctrl.adminUnitSelected, $event)"></span>
+                <span class="fa fa-times-circle" title="Auswahl aufheben" ng-click="ctrl.unselectAdminUnit(ctrl.adminUnitSelected, $event)"></span>
               </div>  
             </div>    
             <div id="map" ngeo-map="ctrl.map"></div>
