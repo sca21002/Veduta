@@ -203,10 +203,13 @@ app.MainController = function(
         features: []
     });
 
-    var x = 10.581;
-    var y = 49.682;
-    var zoom = 8;
+    var zoom = ngeoLocation.getParam('z');
+    zoom = zoom !== undefined ? +zoom : 8;
 
+    var x = ngeoLocation.getParam('x');
+    var y = ngeoLocation.getParam('y');
+    var center = (x !== undefined) && (y !== undefined) ?
+      [+x, +y] : [10.581, 49.682];
 
     /**
     * @type {ol.Map}
@@ -256,7 +259,7 @@ app.MainController = function(
         ],
         view: new ol.View({
             center: ol.proj.transform(
-                [10.581, 49.682], 'EPSG:4326', 'EPSG:3857'
+                center, 'EPSG:4326', 'EPSG:3857'
              ),
             zoom: zoom
         })
@@ -264,8 +267,8 @@ app.MainController = function(
 
     ngeoLocation.updateParams({
       'z': zoom,
-      'x': Math.round(x * 1000) / 1000,
-      'y': Math.round(y * 1000) / 1000
+      'x': Math.round(center[0] * 1000) / 1000,
+      'y': Math.round(center[1] * 1000) / 1000
     });
 
 
