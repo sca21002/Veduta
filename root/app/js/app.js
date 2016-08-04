@@ -132,7 +132,7 @@ app.MainController = function(
         return [new ol.style.Style({
             text: new ol.style.Text({
               text: '\uf28d',
-              font: 'normal 18px FontAwesome',
+              font: 'normal 20px FontAwesome',
               fill: circleFillFn(feature)
             })    
         })];
@@ -149,20 +149,14 @@ app.MainController = function(
     };
 
     this.viewpointStyleSelectedFn = function(feature) {
-        return  new ol.style.Style({
+      var viewCount = parseInt(feature.get('view_count'), 10);
+        return [new ol.style.Style({
             text: new ol.style.Text({
-              text: feature.get('view_count').toString(),
+              text: viewCount.toString(),
               fill: new ol.style.Fill({
                   color: '#000'
               }),
             }),    
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 100, 50, 0.3)'
-            }),
-            stroke: new ol.style.Stroke({
-                width: 2,
-                color: 'rgba(255, 100, 50, 0.8)'
-            }),
             image: new ol.style.Circle({
                 fill: new ol.style.Fill({
                     color: 'rgba(255,255,255,0.4)'
@@ -171,10 +165,12 @@ app.MainController = function(
                     width: 3,
                     color: 'rgba(128,28,49,1)'
                 }),
-                radius: 10
+                radius: getPercent(viewCount) * vm.radiusMax + 3,
+                snapToPixel: false
             })
-        });
+        })];
     };
+
 
     this.viewpointsSource = new ol.source.Vector({
         features: []
