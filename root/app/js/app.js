@@ -86,10 +86,10 @@ app.MainController = function(
 
 
     /**
-     *  * @type {string}
+     *  * @type {string|undefined}
      *  * @export
     */
-    vm.adminUnitSelected = null;
+    vm.adminUnitSelected;
     this.adminUnit = 'lkr';
     this.viewCountMax = 378;
     this.viewCountMin = 1;
@@ -353,8 +353,7 @@ app.MainController = function(
     function updateList() {
         console.log('in updateList');
         var view = vm.map.getView();
-        var mapSize = vm.map.getSize();
-        goog.asserts.assert(mapSize !== undefined);
+        var mapSize = /** @type {ol.Size} */ (vm.map.getSize());
         var extent = view.calculateExtent(mapSize);
         var adminUnitSelected = vm.adminUnitSelected;
         var adminUnit = vm.adminUnit;
@@ -812,7 +811,7 @@ app.MainController.prototype.unselectAdminUnit = function(adminUnitSelected, eve
     console.log('in unselctAdminUnit: ', adminUnitSelected);
     event.stopPropagation();
     this.boundarySource.clear();
-    this.adminUnitSelected = null;    
+    delete this.adminUnitSelected;    
 };
 
 app.module.controller('MainController', app.MainController);
