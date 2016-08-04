@@ -35,6 +35,7 @@
                     </td>    
                   </tr>  
                 </thead>
+                <tfoot><tr><td></td></tr></tfoot>
                 <tbody>    
                 <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
                   <td>
