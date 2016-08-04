@@ -40,7 +40,9 @@ goog.require('veduta.control.Geolocation');
 goog.require('ol.control.Zoom');
 goog.require('ol.control.Attribution');
 goog.require('ol.Attribution');
+/** @suppress {extraRequire} */
 goog.require('ngeo.Location');
+/** @suppress {extraRequire} */
 goog.require('ngeo.Debounce');
 
 

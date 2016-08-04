@@ -38,7 +38,7 @@
                 <tbody>    
                 <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
                   <td>
-                    <div class="thumb-container"><img class="thumbnail-view" ng-src="{{view.icon}}" ng-click="ctrl.thumbnailClicked(view, $event)"/></div> 
+                    <div class="thumb-container"><img class="thumbnail-view" ng-src="{{view.icon}}" title="zur Großansicht" ng-click="ctrl.thumbnailClicked(view, $event)"/></div> 
                     <div class="view-row">
                         <div id="title">{{view.title}}</div/>
                         <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
@@ -75,8 +75,8 @@
     <script src="../node_modules/angular-gettext/dist/angular-gettext.js"></script> 
     <script src="../node_modules/angular-ui-date/dist/date.js"></script> 
     <script src="../node_modules/ui-bootstrap-custom/ui-bootstrap-custom-tpls-1.3.2.min.js"></script> 
-    <script src="/@?main=js/app.js"></script>
-    <!-- <script src="../build/veduta.js"></script> -->    
+    <script src="/@?main=js/app.js"></script> 
+    <!-- <script src="../build/veduta.js"></script> -->   
   </body>
 </html>
 
