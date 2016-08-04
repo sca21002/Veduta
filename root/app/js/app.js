@@ -40,6 +40,8 @@ goog.require('veduta.control.Geolocation');
 goog.require('ol.control.Zoom');
 goog.require('ol.control.Attribution');
 goog.require('ol.Attribution');
+goog.require('ngeo.Location');
+goog.require('ngeo.Debounce');
 
 
 /** @type {!angular.Module} **/
@@ -61,8 +63,9 @@ app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
  * @ngInject
  */
 app.MainController = function(
-    $location, $scope, $window, vedutaBoundary, vedutaDigitool, 
-    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL) {
+    $scope, $window, vedutaBoundary, vedutaDigitool, 
+    vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL, ngeoLocation,
+    ngeoDebounce) {
 
     var vm = this;
 
@@ -100,7 +103,7 @@ app.MainController = function(
     this.vedutaBoundary = vedutaBoundary;
     this.vedutaDigitool = vedutaDigitool;
     this.window = $window;
-    this.debug = $location.search().debug;
+    // this.debug = $location.search().debug;
 
     function getPercent(x) {
       var pMin = vm.radiusMin/vm.radiusMax;
@@ -200,6 +203,11 @@ app.MainController = function(
         features: []
     });
 
+    var x = 10.581;
+    var y = 49.682;
+    var zoom = 8;
+
+
     /**
     * @type {ol.Map}
     * @export
@@ -250,15 +258,17 @@ app.MainController = function(
             center: ol.proj.transform(
                 [10.581, 49.682], 'EPSG:4326', 'EPSG:3857'
              ),
-            zoom: 8
+            zoom: zoom
         })
     });
 
-    /**
-    * @type {number|undefined}
-    * @export
-    */
-    this.zoom = this.map.getView().getZoom();
+    ngeoLocation.updateParams({
+      'z': zoom,
+      'x': Math.round(x * 1000) / 1000,
+      'y': Math.round(y * 1000) / 1000
+    });
+
+
     /**
     * @type {string|undefined} 
     * @export
@@ -645,22 +655,35 @@ app.MainController = function(
         }, this
     );
 
-    ol.events.listen(this.map, ol.MapEventType.MOVEEND,
+   ol.events.listen(this.map, ol.MapEventType.MOVEEND,
         function() {
             console.log('moveend');
             updateList(); 
             $scope.$apply();
         }, this
-    );
+   );
 
-    this.getViewsDown(this.adminUnit);
-
-    if ("geolocation" in navigator) {
-        console.log('Geolocation vorhanden');
-    } else {
-        console.log('Geolocation MICHT vorhanden');
-    }
-
+   ol.events.listen(this.map.getView(), ol.ObjectEventType.PROPERTYCHANGE,
+     ngeoDebounce(
+      /**
+       * @param {ol.ObjectEvent} e Object event.
+       */
+       function(e) {
+         var center = ol.proj.transform(
+           this.getCenter(), 'EPSG:3857', 'EPSG:4326'
+         );
+         var params = {
+           'z': this.getZoom(),
+           'x': Math.round(center[0] * 1000) / 1000,
+           'y': Math.round(center[1] * 1000) / 1000
+         };
+         ngeoLocation.updateParams(params);
+         console.log('Etwas ist geändert!!!: ', this);  
+       }, 300, /* invokeApply */ true
+     )
+   );
+    
+   this.getViewsDown(this.adminUnit);
 };
 
 
