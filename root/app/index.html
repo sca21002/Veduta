@@ -39,7 +39,7 @@
                 <tbody>    
                 <tr class="list-row" ng-repeat="view in ctrl.views.slice(((ctrl.currentPage-1)*ctrl.itemsPerPage), ((ctrl.currentPage)*ctrl.itemsPerPage))" ng-mouseenter="ctrl.hover(view)" ng-mouseleave="ctrl.unhover(view)" ng-click="ctrl.zoomIn(view, $event)">
                   <td>
-                    <div class="thumb-container"><img class="thumbnail-view" ng-src="{{view.icon}}" title="zur Großansicht" ng-click="ctrl.thumbnailClicked(view, $event)"/></div> 
+                    <div class="thumb-container"><img class="thumbnail-view" ng-src="{{view.icon}}" title="Zur Großansicht" ng-click="ctrl.thumbnailClicked(view, $event)"/></div> 
                     <div class="view-row">
                         <div id="title">{{view.title}}</div/>
                         <div ng-show="view.gmd">Gemeinde: {{view.gmd}}</div>
@@ -65,6 +65,7 @@
                   next-text="&gt;"
                   last-text="&gt;|"
                   ng-change="ctrl.pageChanged()"
+                  template-url="template/pagination/pagination.html"
                 ></uib-pagination>
               </div>    
             </div>    
