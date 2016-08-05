@@ -94,8 +94,41 @@ app.MainController = function(
      *  * @type {string|undefined}
      *  * @export
     */
-    vm.adminUnitSelected;
-    this.adminUnit = 'lkr';
+    this.adminUnitSelected;
+
+    this.zoom = ngeoLocation.getParam('z');
+    this.zoom = this.zoom !== undefined ? +this.zoom : 8;
+
+    this.x = ngeoLocation.getParam('x');
+    this.y = ngeoLocation.getParam('y');
+    this.center = (this.x !== undefined) && (this.y !== undefined) ?
+      [+this.x, +this.y] : [10.581, 49.682];
+
+    /**
+    * @type {boolean}
+    * @export
+    */
+    this.debug = ngeoLocation.getParam('debug');
+
+    function getAdminUnitFromZoom(zoom) {
+      var adminUnit;
+      if (zoom >= 13) {
+          adminUnit = 'place';
+      } else if (zoom >= 10) {
+          adminUnit = 'gmd';
+      } else if (zoom >= 8) { 
+          adminUnit = 'lkr';
+      } else if (zoom >= 6) { 
+          adminUnit = 'regbez';
+      } else {
+          adminUnit = 'bundlan';
+      }
+      return adminUnit;
+    }
+
+    this.adminUnit = getAdminUnitFromZoom(this.zoom);
+
+
     this.viewCountMax = 378;
     this.viewCountMin = 1;
     this.colorBasis = "rgba(150,28,49,0.4)";
@@ -105,7 +138,6 @@ app.MainController = function(
     this.vedutaBoundary = vedutaBoundary;
     this.vedutaDigitool = vedutaDigitool;
     this.window = $window;
-    // this.debug = $location.search().debug;
 
     function getPercent(x) {
       var pMin = vm.radiusMin/vm.radiusMax;
@@ -155,6 +187,7 @@ app.MainController = function(
 
     this.viewpointStyleSelectedFn = function(feature) {
       var viewCount = parseInt(feature.get('view_count'), 10);
+      console.log('view_count: ', viewCount);
         return [new ol.style.Style({
             text: new ol.style.Text({
               text: viewCount.toString(),
@@ -205,14 +238,6 @@ app.MainController = function(
         features: []
     });
 
-    var zoom = ngeoLocation.getParam('z');
-    zoom = zoom !== undefined ? +zoom : 8;
-
-    var x = ngeoLocation.getParam('x');
-    var y = ngeoLocation.getParam('y');
-    var center = (x !== undefined) && (y !== undefined) ?
-      [+x, +y] : [10.581, 49.682];
-
     /**
     * @type {ol.Map}
     * @export
@@ -261,16 +286,16 @@ app.MainController = function(
         ],
         view: new ol.View({
             center: ol.proj.transform(
-                center, 'EPSG:4326', 'EPSG:3857'
+                this.center, 'EPSG:4326', 'EPSG:3857'
              ),
-            zoom: zoom
+            zoom: this.zoom
         })
     });
 
     ngeoLocation.updateParams({
-      'z': zoom,
-      'x': Math.round(center[0] * 1000) / 1000,
-      'y': Math.round(center[1] * 1000) / 1000
+      'z': this.zoom,
+      'x': Math.round(this.center[0] * 1000) / 1000,
+      'y': Math.round(this.center[1] * 1000) / 1000
     });
 
 
@@ -589,23 +614,12 @@ app.MainController = function(
         ol.Object.getChangeEventType(ol.ViewProperty.RESOLUTION),
         function() {
             console.log('in change:resolution');
-            var adminUnit;
-            var zoomOld = vm.zoom;
-            vm.zoom = vm.map.getView().getZoom(); 
-            if (vm.zoom >= 13) {
-                adminUnit = 'place';
-            } else if (vm.zoom >= 10) {
-                adminUnit = 'gmd';
-            } else if (vm.zoom >= 8) { 
-                adminUnit = 'lkr';
-            } else if (vm.zoom >= 6) { 
-                adminUnit = 'regbez';
-            } else {
-                adminUnit = 'bundlan';
-            }
+            var zoomOld = this.zoom;
+            this.zoom = vm.map.getView().getZoom(); 
+            var adminUnit = getAdminUnitFromZoom(this.zoom);
             if (adminUnit !== vm.adminUnit) {
                 vm.adminUnit = adminUnit;
-                if (zoomOld > vm.zoom) {
+                if (zoomOld > this.zoom) {
                     this.getViewsUp(vm.adminUnit);
                 } else {
                     this.getViewsDown(vm.adminUnit);
