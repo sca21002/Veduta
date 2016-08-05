@@ -39,6 +39,7 @@ goog.require('ol.geom.LineString');
 goog.require('veduta.control.Geolocation');
 goog.require('ol.control.Zoom');
 goog.require('ol.control.Attribution');
+goog.require('ol.control.ZoomToExtent');
 goog.require('ol.Attribution');
 /** @suppress {extraRequire} */
 goog.require('ngeo.Location');
@@ -187,7 +188,6 @@ app.MainController = function(
 
     this.viewpointStyleSelectedFn = function(feature) {
       var viewCount = parseInt(feature.get('view_count'), 10);
-      console.log('view_count: ', viewCount);
         return [new ol.style.Style({
             text: new ol.style.Text({
               text: viewCount.toString(),
@@ -226,6 +226,12 @@ app.MainController = function(
       target: document.getElementById('attribution'),
       collapsible: false,
       collapsed: false
+    });
+
+    this.zoomToExtentControl = new ol.control.ZoomToExtent({
+      label: '\uf0b2',
+      tipLabel: 'Übersichtskarte',
+      extent: [1017894, 6279199, 1336572, 6509802]
     });
 
     this.boundarySource = new ol.source.Vector({
@@ -282,7 +288,8 @@ app.MainController = function(
         controls: [
           this.geolocationControl,
           this.zoomControl,
-          this.attributionControl
+          this.attributionControl,
+          this.zoomToExtentControl
         ],
         view: new ol.View({
             center: ol.proj.transform(
@@ -697,7 +704,6 @@ app.MainController = function(
            'y': Math.round(center[1] * 1000) / 1000
          };
          ngeoLocation.updateParams(params);
-         console.log('Etwas ist geändert!!!: ', this);  
        }, 300, /* invokeApply */ true
      )
    );
