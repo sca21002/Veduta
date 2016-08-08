@@ -231,7 +231,7 @@ Related object: L<Veduta::Schema::Result::Regbez>
 =cut
 
 __PACKAGE__->belongs_to(
-  "regbez",
+ "regbez",
   "Veduta::Schema::Result::Regbez",
   { sch => "regbez_id" },
   {

@@ -14,6 +14,8 @@ goog.require('veduta.Locations');
 goog.require('veduta.AdminUnit');
 /** @suppress {extraRequire} */
 goog.require('veduta.Thumbnail');
+/** @suppress {extraRequire} */
+goog.require('veduta.Geocoder');
 
 /**
  * This goog.require is needed because it provides 'ngeo-map' used in
@@ -51,8 +53,9 @@ goog.require('ngeo.Debounce');
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
 app.module.constant('vedutaServerURL', 
-        'http://rzbvm038.uni-regensburg.de/veduta-srv/');
-//app.module.constant('vedutaServerURL', 'http://localhost:8888/');
+//        'http://rzbvm038.uni-regensburg.de/veduta-srv/');
+        'http://rzbvm038.uni-regensburg.de:8888/');
+//        'http://localhost:8888/');
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
   'sca21002/cip8kcaih002zcuns1cle262m/tiles/{z}/{x}/{y}?access_token=' +
@@ -66,7 +69,7 @@ app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
  * @ngInject
  */
 app.MainController = function(
-    $scope, $window, vedutaBoundary, vedutaDigitool, 
+    $scope, $window, vedutaBoundary, vedutaDigitool, vedutaGeocoder,
     vedutaLocations, vedutaAdminUnit, vedutaThumbnail, mapboxURL, ngeoLocation,
     ngeoDebounce) {
 
@@ -92,10 +95,22 @@ app.MainController = function(
 
 
     /**
-     *  * @type {string|undefined}
+     *  * @type {Object}
      *  * @export
     */
     this.adminUnitSelected;
+
+    /**
+     *  * @type {string|undefined}
+     *  * @export
+    */
+    this.searchTerm;
+
+    /**
+    * @type {Array.<Object>} 
+    * @export
+    */
+    this.places = [];
 
     this.zoom = ngeoLocation.getParam('z');
     this.zoom = this.zoom !== undefined ? +this.zoom : 8;
@@ -110,6 +125,12 @@ app.MainController = function(
     * @export
     */
     this.debug = ngeoLocation.getParam('debug');
+
+    /**
+    * @type {boolean}
+    * @export
+    */
+    this.showGeocoderResult = false;
 
     function getAdminUnitFromZoom(zoom) {
       var adminUnit;
@@ -138,6 +159,7 @@ app.MainController = function(
     this.vedutaAdminUnit = vedutaAdminUnit;
     this.vedutaBoundary = vedutaBoundary;
     this.vedutaDigitool = vedutaDigitool;
+    this.vedutaGeocoder = vedutaGeocoder;
     this.window = $window;
 
     function getPercent(x) {
@@ -152,6 +174,7 @@ app.MainController = function(
       }
     }
 
+    // Überflüssig!!! 
     var circleFillFn = function(feature) {
       var viewCount = parseInt(feature.get('view_count'), 10);
       return new ol.style.Fill({
@@ -209,6 +232,16 @@ app.MainController = function(
         })];
     };
 
+    this.geocodingStyleSelected = new ol.style.Style({
+      text: new ol.style.Text({
+        text: '\uf041',
+        font: 'normal 40px FontAwesome',
+        fill: new ol.style.Fill({
+            color: "rgba(150,28,49,1"
+        })
+      })
+    });        
+
 
     this.viewpointsSource = new ol.source.Vector({
         features: []
@@ -241,6 +274,10 @@ app.MainController = function(
                    '<a href="www.geodaten.bayern.de">www.geodaten.bayern.de</a>'
           })       
         ],
+        features: []
+    });
+
+    this.geocodingSource = new ol.source.Vector({
         features: []
     });
 
@@ -283,6 +320,19 @@ app.MainController = function(
                     })
                 })
 
+            }),
+            new ol.layer.Vector({
+                name: 'geocoding',
+                source: this.geocodingSource,
+                style: new ol.style.Style({
+                  text: new ol.style.Text({
+                    text: '\uf041',
+                    font: 'normal 30px FontAwesome',
+                    fill: new ol.style.Fill({
+                        color: "rgba(150,28,49," + vm.alpha + ")"
+                    })
+                  })    
+                })
             })
         ],
         controls: [
@@ -707,7 +757,7 @@ app.MainController = function(
        }, 300, /* invokeApply */ true
      )
    );
-    
+
    this.getViewsDown(this.adminUnit);
 };
 
@@ -857,6 +907,93 @@ app.MainController.prototype.unselectAdminUnit = function(adminUnitSelected, eve
     this.boundarySource.clear();
     delete this.adminUnitSelected;    
 };
+
+/**
+ * @param {String} searchTerm searchTerm.
+ * @export
+ */
+app.MainController.prototype.search = function(searchTerm) {
+    console.log('in search: ', searchTerm);
+    this.places = [];
+    this.geocodingSource.clear();
+    this.vedutaGeocoder.geocode(searchTerm).
+            then(function(geoJSON){
+                var geojsonFormat = new ol.format.GeoJSON();
+                var features = geojsonFormat.readFeatures(geoJSON);
+                var index = 0;
+                features.forEach(function(feature) {
+                   var point =  /** @type {ol.geom.Point} */ (feature.getGeometry());
+                   var place = {};
+                   place['id'] = index;
+                   place['name'] = feature.get('name');
+                   place['type'] = feature.get('type');
+                   place['coordinates'] = point.getCoordinates();
+                   this.places.push(place);
+                   index++;
+                }, this);
+                // console.log('Feature: ', this.places);
+                this.geocodingSource.addFeatures(features);
+                this.showGeocoderResult = true;
+            }.bind(this));
+};
+
+/**
+ * @param {Object} place Place.
+ * @export
+ */
+app.MainController.prototype.centerToPlace = function(place) {
+    console.log('in centerToPlace: ', place);
+    var view = this.map.getView();
+    //var coords3857 = ol.proj.transform(place.coordinates, 'EPSG:4326', 'EPSG:3857');
+    //view.setCenter(coords3857);
+    view.setCenter(place['coordinates']);
+    view.setZoom(15);
+};
+
+/**
+ * @param {jQuery.Event} event Event.
+ * @export
+ */
+app.MainController.prototype.closeGeocoderList = function(event) {
+    console.log('in closeGeocoderList');
+    event.stopPropagation();
+    this.places = [];
+    this.searchTerm = '';
+    this.geocodingSource.clear();
+    this.showGeocoderResult = false;
+};
+
+/**
+ * @param {Object} place Place.
+ * @export
+ */
+app.MainController.prototype.geocodingHover = function(place) {
+    console.log('In geocodingHover: ', place.id);
+    var features = this.geocodingSource.getFeatures();
+    console.log('Features: ', features);
+    var selectedFeature = features[place.id];
+    console.log('Name: ', selectedFeature.get('name'));
+    selectedFeature.setStyle(this.geocodingStyleSelected);
+
+//    var view_id = view.id;
+//    var feature = this.getFeature_(this.adminUnit, view_id);
+//    feature.setStyle(this.viewpointStyleSelectedFn(feature));
+//    this.selectedFeatures.push(feature);
+};
+
+
+/**
+ * @param {Object} place Place.
+ * @export
+ */
+app.MainController.prototype.geocodingUnhover = function(place) {
+    console.log('in geocodingUnhover');
+    var features = this.geocodingSource.getFeatures();
+    var selectedFeature = features[place.id];
+    selectedFeature.setStyle(null);
+//    this.unselectPreviousFeatures();
+};
+
 
 app.module.controller('MainController', app.MainController);
 

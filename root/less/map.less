@@ -4,6 +4,11 @@
 #map {
     height: 484px;
 }
+
+.map-container {
+    position: relative;
+}
+
 .ol-zoom {
     left: unset;
     top: unset;
@@ -19,6 +24,89 @@
     left: unset;
     bottom: 5.9em;
 }
+
+.map-header {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.search-container {
+    display: inline-block;
+}
+
+.search-submit {
+    font-family: FontAwesome;
+}
+
+.btn-primary {
+    background: rgba(204,204,204,1);
+    border-color: rgba(179,179,179,1);
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: rgba(179,179,179,1);
+    border-color: rgba(153,153,153,1);
+    color: #fff;
+}
+
+.form-control:focus {
+    border-color: rgba(150,28,49,0.4);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(150,28,49,0.3);
+}
+
+.geocoder-result-container {
+    position: absolute;
+    top: 35px;
+    background: rgba(255,255,255,1);
+    border: 1px solid #f5f5f5;
+}
+
+.geocoder-result-title {
+    padding: 20px 20px 10px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.geocoder-result-close {
+    float: right;
+}
+
+
+.geocoder-result-list {
+    width: 186px;
+    margin-bottom: 0px;
+}
+
+.geocoder-result-entry {
+    border-top: 1px solid #ddd;
+}
+
+li.geocoder-result-entry:hover,
+li.geocoder-result-entry:focus {
+    background: #f5f5f5;
+}
+
+.geocoder-result-text {
+    padding: 10px 20px;    
+}
+
+//.veduta-search {
+//    font-family: FontAwesome;
+//    left: 15px;
+//    top: 0px;
+//    right: unset;
+//    bottom: unset;
+//    line-height: 0.4em;
+//}
+//
+//.veduta-search-submit {
+//    font-family: FontAwesome;
+//    height: 2em;
+//}
+
 
 .ol-zoom-extent {
     font-family: FontAwesome;
@@ -56,6 +144,8 @@
 .admin-unit-selected {
     min-height: 30px;
     padding: 5px;
+    display: inline-block;
+    float: right;
 }
 
 span.fa-times-circle:focus,

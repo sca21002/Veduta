@@ -2,7 +2,12 @@ package Veduta;
 
 # ABSTRACT: Veduta is a Web Application to search geographically for vistas
 
+use Veduta::Types qw(Str UBRGeoCoderOpenCage GeoTransformation);
 use Moose;
+use Moose;
+use MooseX::AttributeShortcuts;
+use UBR::Geo::Coder::OpenCage;
+use UBR::Geo::Geotransform::Simple;
 use namespace::autoclean;
 
 use Catalyst::Runtime 5.80;
@@ -28,6 +33,37 @@ use Catalyst qw/
 extends 'Catalyst';
 
 our $VERSION = '0.01';
+
+has 'opencage_api_key' => (
+    is => 'ro',
+    isa => Str,
+    required => 1,
+);
+
+has 'geocoder' => (
+    is  => 'lazy',
+    isa => UBRGeoCoderOpenCage,
+);
+
+has 'geotransformation' => (
+    is => 'lazy',
+    isa => GeoTransformation,
+);
+
+sub _build_geocoder {
+    my $self = shift;
+
+    return new UBR::Geo::Coder::OpenCage(
+        api_key => $self->opencage_api_key,
+        language => 'de',
+        country => 'de',
+        bounds => [ 8.945, 48.825, 12.278, 50.580 ],
+    );
+}
+
+sub _build_geotransformation {
+  return new UBR::Geo::Geotransform::Simple;
+}
 
 # Configure the application.
 #

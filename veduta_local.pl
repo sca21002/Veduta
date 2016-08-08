@@ -2,6 +2,8 @@
     name  => 'Veduta',
     stage => 'test',
 
+    opencage_api_key => '310cd70a7d89de40aca599348f6675cd',
+
     'Model::VedutaDB' => {
         connect_info => {
             dsn               => 'dbi:Pg:dbname=veduta',
