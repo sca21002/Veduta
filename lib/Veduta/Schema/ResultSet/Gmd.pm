@@ -35,3 +35,28 @@ sub find_with_geojson {
 
     )->first;
 }
+
+sub contains_point {
+    my ($self, $x, $y, $srid) = @_; 
+
+    my $contains = sprintf(
+        "ST_CONTAINS(me.geom,ST_TRANSFORM(ST_SetSRID(ST_Point(%f,%f),%u),31468))",
+        $x, $y, $srid
+    );
+
+    return $self->search(
+        {
+            -bool => \$contains
+        },
+        {
+            select => [
+                'sch',
+                'bez_gem',
+                'adm',
+                \'ST_AsGeoJSON(ST_Transform(geom,3857))',
+                \"ST_AsGeoJSON(bbox)",
+            ],
+            as  => ['gmd_id', 'bez_gem', 'adm', 'geom', 'bbox'],
+        }
+    )->first;
+}
