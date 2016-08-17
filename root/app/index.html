@@ -25,7 +25,7 @@
                   </form>    
                 </div>
                 <div class="admin-unit-selected" ng-show="ctrl.adminUnitSelected.fullname">Ausgewählt: {{ctrl.adminUnitSelected.fullname}} 
-                    <div class="fa fa-times-circle" title="Auswahl aufheben" ng-click="ctrl.unselectAdminUnit(ctrl.adminUnitSelected, $event)"></div>
+                    <div class="fa fa-times-circle" title="Auswahl aufheben" ng-click="ctrl.unselectAdminUnit($event)"></div>
                 </div> 
               </div>    
               <div id="map" ngeo-map="ctrl.map"></div>
@@ -101,12 +101,12 @@
         </div>  
       </div>
     </main>
-    <!-- <script src="../node_modules/angular/angular.js"></script>
+    <script src="../node_modules/angular/angular.js"></script>
     <script src="../node_modules/angular-gettext/dist/angular-gettext.js"></script> 
     <script src="../node_modules/angular-ui-date/dist/date.js"></script> 
     <script src="../node_modules/ui-bootstrap-custom/ui-bootstrap-custom-tpls-1.3.2.min.js"></script> 
     <script src="/@?main=js/app.js"></script> -->
-    <script src="../build/veduta.js"></script>   
+    <!-- <script src="../build/veduta.js"></script> -->   
   </body>
 </html>
 

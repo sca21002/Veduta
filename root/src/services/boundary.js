@@ -45,6 +45,22 @@ veduta.Boundary.prototype.getBoundary = function(adminUnit, id) {
 
 
 /**
+* @param {Array.<number>} coordinate Coordinates of contained point.
+* @return {angular.$q.Promise} Promise.
+* @export
+*/
+veduta.Boundary.prototype.getBoundaryByCoordinate = function(coordinate) {
+
+    var url = this.baseURL_ + 'admin/gmd/contains/point?x=' + 
+        coordinate[0] + '&y=' + coordinate[1]
+
+    return this.$http_.get(url).then(
+        this.handleGetBoundary_.bind(this)
+    );
+}
+
+
+/**
  * @param {angular.$http.Response} resp Ajax response.
  * @return {Object.<string, number>} The Locations object.
  * @private

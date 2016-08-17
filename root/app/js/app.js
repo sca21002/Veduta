@@ -53,8 +53,8 @@ goog.require('ngeo.Debounce');
 app.module = angular.module('vedutaApp', [veduta.module.name, 'ui.bootstrap']);
 
 app.module.constant('vedutaServerURL', 
-//        'http://rzbvm038.uni-regensburg.de/veduta-srv/');
-        'http://rzbvm038.uni-regensburg.de:8888/');
+        'http://rzbvm038.uni-regensburg.de/veduta-srv/');
+//        'http://rzbvm038.uni-regensburg.de:8888/');
 //        'http://localhost:8888/');
 
 app.module.constant('mapboxURL', 'https://api.mapbox.com/styles/v1/' +
@@ -897,12 +897,11 @@ app.MainController.prototype.thumbnailClicked = function(view, event) {
 };
 
 /**
- * @param {Object} adminUnitSelected adminUnitSelected.
  * @param {jQuery.Event} event Event.
  * @export
  */
-app.MainController.prototype.unselectAdminUnit = function(adminUnitSelected, event) {
-    console.log('in unselctAdminUnit: ', adminUnitSelected);
+app.MainController.prototype.unselectAdminUnit = function(event) {
+    console.log('in unselctAdminUnit');
     event.stopPropagation();
     this.boundarySource.clear();
     delete this.adminUnitSelected;    
@@ -943,11 +942,45 @@ app.MainController.prototype.search = function(searchTerm) {
  */
 app.MainController.prototype.centerToPlace = function(place) {
     console.log('in centerToPlace: ', place);
-    var view = this.map.getView();
-    //var coords3857 = ol.proj.transform(place.coordinates, 'EPSG:4326', 'EPSG:3857');
-    //view.setCenter(coords3857);
-    view.setCenter(place['coordinates']);
-    view.setZoom(15);
+    console.log('in centerToPlace: ', place['coordinates']);
+    this.boundarySource.clear();
+    delete this.adminUnitSelected;    
+    this.vedutaBoundary.getBoundaryByCoordinate(place['coordinates']).
+      then(function(geoJSON){
+          var geojsonFormat = new ol.format.GeoJSON();
+          var features = geojsonFormat.readFeatures(geoJSON);
+          // get bounding box for zooming
+          var feature = features[0];
+          var bbox = angular.fromJson(feature.get('bbox'));
+          var xmin = bbox.coordinates[0][0][0];
+          var ymin = bbox.coordinates[0][0][1];
+          var xmax = bbox.coordinates[0][2][0];
+          var ymax = bbox.coordinates[0][2][1];
+       
+          var mapSize = /** @type {ol.Size} */ (this.map.getSize());
+          this.map.getView().fit(
+              [xmin,ymin,xmax,ymax], mapSize, /** @type {olx.view.FitOptions} */ ({nearest: true})
+          );
+          this.boundarySource.clear();        
+          this.boundarySource.addFeatures(features);
+
+          // draw next lower admin unit
+          this.getViewsDown('place');
+
+          // set admin to new admin unit
+          this.adminUnit = 'place';
+
+          this.adminUnitSelected = {
+            id: feature.get('gmd_id'),
+            name: feature.get('bez_gem'),
+            admin: 'gmd'
+          };
+          this.adminUnitSelected['fullname'] = this.vedutaAdminUnit.getFullName(
+            feature.get('bez_gem'),
+            'gmd',
+            feature.get('adm')
+          );
+      }.bind(this));
 };
 
 /**
