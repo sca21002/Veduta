@@ -46,7 +46,7 @@ sub _build_valid_types {
         building => 'Gebäude',
         village  => 'Dorf',
         neighbourhood => 'Ortsteil',
-        city => 'Stadt',
+        city => 'Ort',
     };
 };
 

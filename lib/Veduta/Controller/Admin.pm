@@ -55,6 +55,26 @@ sub boundary : Chained('map_with_geojson') PathPart('boundary') Args(0) {
     );
 }
 
+sub contains : Chained('admins') PathPart('contains') CaptureArgs(0) {
+}
+
+sub contains_point : Chained('contains') PathPart('point') Args(0) {
+    my ($self, $c) = @_;
+   
+    my $rs = $c->stash->{admin_rs}; 
+    my $query_params = $c->req->query_params;
+    
+    my($x, $y) = @{$query_params}{'x','y'};
+    my $srid = 3857;
+    my $admin = $rs->contains_point($x, $y, $srid)
+      || $c->detach('not_found');
+    my $feature = $admin->as_feature_object;
+    $c->stash(
+        feature_collection => $feature,
+        current_view => 'GeoJSON',
+    );
+}
+
 
 =encoding utf8
 
