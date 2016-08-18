@@ -19,7 +19,8 @@
                 <div class="search-container">
                   <form class="search-form form-inline">
                     <input type="text" class="form-control input-sm" placeholder="Ort in Franken" ng-model="ctrl.searchTerm"/>
-                    <button type="submit" class="search-submit btn btn-primary btn-sm" ng-click="ctrl.search(ctrl.searchTerm)">
+                    <button type="submit" class="search-submit btn btn-primary btn-sm" ng-click="ctrl.search(ctrl.searchTerm)"
+                        title="Suche starten">
                         &#xf002
                     </button>
                   </form>    
@@ -38,7 +39,8 @@
                     </div>
                   </div>
                 <ul class="geocoder-result-list">
-                    <li class="geocoder-result-entry" ng-repeat="place in ctrl.places" 
+                    <li class="geocoder-result-entry" title="Auf der Karte zeigen"
+                                                      ng-repeat="place in ctrl.places" 
                                                       ng-click="ctrl.centerToPlace(place)"
                                                       ng-mouseenter="ctrl.geocodingHover(place)"
                                                       ng-mouseleave="ctrl.geocodingUnhover(place)">
@@ -47,6 +49,10 @@
                       </div> 
                     </li>
                 </ul>
+                <p class="geocoder-result-attribution">
+                Geodaten © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</a><br/>
+                             über <a href="http://www.opencagedata.com">OpenCage Geo Services</a> 
+                </p>
               </div>
             </div>
           </div>
