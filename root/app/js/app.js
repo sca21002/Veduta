@@ -697,7 +697,12 @@ app.MainController = function(
         }, null, function(layer) {
             return layer.get('name') === 'views';
         });
-        if (!hit) { vm.unselectPreviousFeatures(); }
+        if (hit) {
+            this.getTarget().style.cursor = 'pointer';
+        } else {
+            this.getTarget().style.cursor = '';
+            vm.unselectPreviousFeatures();
+        }        
     }); 
 
     ol.events.listen(this.map, ol.MapBrowserEvent.EventType.CLICK,
