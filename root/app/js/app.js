@@ -980,10 +980,10 @@ app.MainController.prototype.centerToPlace = function(place) {
             name: feature.get('bez_gem'),
             admin: 'gmd'
           };
+          var name = /** @type {string} */ (feature.get('bez_gem'));
+          var adm  = /** @type {string} */ (feature.get('adm'));
           this.adminUnitSelected['fullname'] = this.vedutaAdminUnit.getFullName(
-            feature.get('bez_gem'),
-            'gmd',
-            feature.get('adm')
+            name, 'gmd', adm
           );
       }.bind(this));
 };
@@ -1030,6 +1030,18 @@ app.MainController.prototype.geocodingUnhover = function(place) {
     var selectedFeature = features[place.id];
     selectedFeature.setStyle(null);
 //    this.unselectPreviousFeatures();
+};
+
+/**
+ * @param {Object} view View.
+ * @export
+ */
+app.MainController.prototype.getTooltip = function(view) {
+    if (view.admin) {
+        return view.name + ' auswählen';
+    } else {
+        return 'Detailansicht öffnen';
+    }
 };
 
 
